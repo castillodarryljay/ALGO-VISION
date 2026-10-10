@@ -1,0 +1,6 @@
+{
+  "name": "AlgoVision - Algorithm Visualizer & Learning Lab",
+  "description": "Interactive data structures and algorithms visualizer with real execution traces, multi-language code synchronization, recursion trees, and comparative analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
