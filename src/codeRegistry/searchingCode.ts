@@ -109,6 +109,167 @@ int linearSearch(const std::vector<int>& arr, int target) {
     },
   },
 
+  'sentinel-search': {
+    javascript: {
+      language: 'javascript',
+      lineMapping: {
+        sentinel_start: 1,
+        sentinel_place: 5,
+        sentinel_loop: 7,
+        sentinel_restore: 10,
+        sentinel_found: 12,
+        sentinel_not_found: 14,
+      },
+      code: `function sentinelSearch(arr, target) {
+  const n = arr.length;
+  if (n === 0) return -1;
+  const last = arr[n - 1];
+  arr[n - 1] = target; // Set sentinel
+  let i = 0;
+  while (arr[i] !== target) {
+    i++;
+  }
+  arr[n - 1] = last; // Restore original
+  if (i < n - 1 || last === target) {
+    return i; // Target found
+  }
+  return -1; // Target absent
+}`,
+    },
+    python: {
+      language: 'python',
+      lineMapping: {
+        sentinel_start: 1,
+        sentinel_place: 5,
+        sentinel_loop: 7,
+        sentinel_restore: 9,
+        sentinel_found: 11,
+        sentinel_not_found: 12,
+      },
+      code: `def sentinel_search(arr, target):
+    n = len(arr)
+    if n == 0: return -1
+    last = arr[n - 1]
+    arr[n - 1] = target # Set sentinel
+    i = 0
+    while arr[i] != target:
+        i += 1
+    arr[n - 1] = last # Restore original
+    if i < n - 1 or last == target:
+        return i # Target found
+    return -1`,
+    },
+    java: {
+      language: 'java',
+      lineMapping: {
+        sentinel_start: 2,
+        sentinel_place: 6,
+        sentinel_loop: 8,
+        sentinel_restore: 11,
+        sentinel_found: 13,
+        sentinel_not_found: 15,
+      },
+      code: `public class SentinelSearch {
+    public static int search(int[] arr, int target) {
+        int n = arr.length;
+        if (n == 0) return -1;
+        int last = arr[n - 1];
+        arr[n - 1] = target; // Set sentinel
+        int i = 0;
+        while (arr[i] != target) {
+            i++;
+        }
+        arr[n - 1] = last; // Restore
+        if (i < n - 1 || last == target) {
+            return i;
+        }
+        return -1;
+    }
+}`,
+    },
+    cpp: {
+      language: 'cpp',
+      lineMapping: {
+        sentinel_start: 3,
+        sentinel_place: 7,
+        sentinel_loop: 9,
+        sentinel_restore: 12,
+        sentinel_found: 14,
+        sentinel_not_found: 16,
+      },
+      code: `#include <vector>
+
+int sentinelSearch(std::vector<int>& arr, int target) {
+    int n = arr.size();
+    if (n == 0) return -1;
+    int last = arr[n - 1];
+    arr[n - 1] = target;
+    int i = 0;
+    while (arr[i] != target) {
+        i++;
+    }
+    arr[n - 1] = last;
+    if (i < n - 1 || last == target) {
+        return i;
+    }
+    return -1;
+}`,
+    },
+    c: {
+      language: 'c',
+      lineMapping: {
+        sentinel_start: 1,
+        sentinel_place: 4,
+        sentinel_loop: 6,
+        sentinel_restore: 9,
+        sentinel_found: 11,
+        sentinel_not_found: 13,
+      },
+      code: `int sentinelSearch(int arr[], int n, int target) {
+    if (n <= 0) return -1;
+    int last = arr[n - 1];
+    arr[n - 1] = target;
+    int i = 0;
+    while (arr[i] != target) {
+        i++;
+    }
+    arr[n - 1] = last;
+    if (i < n - 1 || last == target) {
+        return i;
+    }
+    return -1;
+}`,
+    },
+    csharp: {
+      language: 'csharp',
+      lineMapping: {
+        sentinel_start: 2,
+        sentinel_place: 6,
+        sentinel_loop: 8,
+        sentinel_restore: 11,
+        sentinel_found: 13,
+        sentinel_not_found: 15,
+      },
+      code: `public class SentinelSearcher {
+    public static int Search(int[] arr, int target) {
+        int n = arr.Length;
+        if (n == 0) return -1;
+        int last = arr[n - 1];
+        arr[n - 1] = target;
+        int i = 0;
+        while (arr[i] != target) {
+            i++;
+        }
+        arr[n - 1] = last;
+        if (i < n - 1 || last == target) {
+            return i;
+        }
+        return -1;
+    }
+}`,
+    },
+  },
+
   'jump-search': {
     javascript: {
       language: 'javascript',

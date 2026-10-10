@@ -11,7 +11,8 @@ import { generateShellSortTrace } from '../sorting/shellSort';
 import { generateBucketSortTrace } from '../sorting/bucketSort';
 import { 
   generateLinearSearchTrace, 
-  generateBinarySearchTrace 
+  generateBinarySearchTrace,
+  generateSentinelSearchTrace 
 } from '../searching/searchingAlgorithms';
 import { runBFS, runDijkstra } from '../graphs/graphEngine';
 import { insertAVL, getBalance } from '../dataStructures/dataStructureEngine';
@@ -97,6 +98,31 @@ describe('Searching Algorithms', () => {
     const lastEvent = trace[trace.length - 1];
     expect(lastEvent.type).toBe('TARGET_NOT_FOUND');
   });
+
+  it('Sentinel Search finds existing target in middle', () => {
+    const arr = [10, 50, 30, 70, 80, 20];
+    const trace = generateSentinelSearchTrace(arr, 70);
+    const lastEvent = trace[trace.length - 1];
+    expect(lastEvent.type).toBe('TARGET_FOUND');
+    expect(lastEvent.indices).toEqual([3]);
+    // Ensure last element was restored properly
+    expect(trace[trace.length - 1].arraySnapshot).toEqual([10, 50, 30, 70, 80, 20]);
+  });
+
+  it('Sentinel Search finds target at the last index', () => {
+    const arr = [10, 50, 30, 70, 80, 20];
+    const trace = generateSentinelSearchTrace(arr, 20);
+    const lastEvent = trace[trace.length - 1];
+    expect(lastEvent.type).toBe('TARGET_FOUND');
+    expect(lastEvent.indices).toEqual([5]);
+  });
+
+  it('Sentinel Search correctly reports missing target', () => {
+    const arr = [10, 50, 30, 70, 80, 20];
+    const trace = generateSentinelSearchTrace(arr, 999);
+    const lastEvent = trace[trace.length - 1];
+    expect(lastEvent.type).toBe('TARGET_NOT_FOUND');
+  });
 });
 
 describe('Graph Algorithms', () => {
@@ -157,6 +183,7 @@ describe('Multi-Language Code Registry Coverage', () => {
     'shell-sort',
     'bucket-sort',
     'linear-search',
+    'sentinel-search',
     'binary-search',
     'jump-search',
     'interpolation-search',

@@ -192,5 +192,50 @@ export const LEARNING_LESSONS: LearningLesson[] = [
         explanation: 'log₂(1024) = 10. With boundary checks and integer division, at most 11 comparisons are performed in the worst case.'
       }
     ]
+  },
+  {
+    id: 'lesson-sentinel-search',
+    algorithmId: 'sentinel-search',
+    title: 'Loop Optimization: Sentinel Linear Search',
+    category: 'Searching',
+    difficulty: 'Intermediate',
+    overview: 'Sentinel Linear Search is a clever optimization over naive Linear Search that reduces the number of conditional checks inside the main scanning loop.',
+    coreIdea: 'In standard linear search, each iteration evaluates two checks: (1) whether the index reached the end (i < n), and (2) whether arr[i] == target. By placing the target at the very end of the array as a "sentinel", the search is guaranteed to terminate without ever needing the index bound check!',
+    stepByStepExplanation: [
+      '1. Save the original last element of the array: last = arr[n - 1].',
+      '2. Overwrite the last element with target: arr[n - 1] = target (the sentinel).',
+      '3. Run a minimal while loop: while (arr[i] != target) i++. No boundary check needed!',
+      '4. Restore original last element: arr[n - 1] = last.',
+      '5. Verification: If i < n - 1 or last == target, the target was found at index i; otherwise target is absent.'
+    ],
+    complexityAnalysis: {
+      time: 'Best: O(1); Average & Worst: O(n) (cuts loop branches in half)',
+      space: 'O(1) in-place auxiliary memory',
+      intuition: 'Performs n + 2 comparisons total instead of 2n + 1 comparisons in regular linear search, yielding substantial speedups on hardware with branch prediction pressure.',
+    },
+    advantages: [
+      'Eliminates half the branch comparisons compared to naive linear search.',
+      'Does not require sorted input array.',
+      'Extremely compact and fast in CPU instruction caches.'
+    ],
+    limitations: [
+      'Requires writing to the array (temporarily mutable dataset).',
+      'Still has linear O(n) asymptotic time complexity, unsuitable for massive static collections where binary search can be used.'
+    ],
+    commonMistakes: [
+      'Forgetting to restore the original last element arr[n - 1] after the search loop ends, permanently corrupting the array.',
+      'Failing to verify if the match at index n - 1 was actually the original element or just the planted sentinel.'
+    ],
+    relatedAlgorithms: ['Linear Search', 'Binary Search', 'Jump Search'],
+    questions: [
+      {
+        id: 'q1',
+        question: 'What is the primary operational advantage of Sentinel Linear Search over standard Linear Search?',
+        options: ['It reduces time complexity to O(log n)', 'It eliminates the index boundary check (i < n) per loop step', 'It sorts the array in-place', 'It allows searching linked lists without pointers'],
+        correctIndex: 1,
+        explanation: 'By ensuring the target will always be encountered, the loop does not need to verify if i < n on every single iteration, saving roughly half the CPU comparisons.'
+      }
+    ]
   }
 ];
+

@@ -182,6 +182,20 @@ export const ALGORITHMS: AlgorithmMeta[] = [
     defaultData: [15, 32, 8, 47, 92, 19, 64, 53, 27, 71],
   },
   {
+    id: 'sentinel-search',
+    name: 'Sentinel Linear Search',
+    category: 'searching',
+    shortDescription: 'Appends target as a sentinel at the end to eliminate index boundary checks within the main loop.',
+    fullDescription: 'Sentinel Search optimizes classic Linear Search by temporarily replacing the last element with the target. This ensures the loop terminates without evaluating "i < n" on every step, cutting comparisons per iteration in half.',
+    complexity: {
+      bestTime: 'O(1)',
+      averageTime: 'O(n)',
+      worstTime: 'O(n)',
+      spaceComplexity: 'O(1)',
+    },
+    defaultData: [18, 42, 7, 99, 53, 29, 81, 14, 63, 35],
+  },
+  {
     id: 'binary-search',
     name: 'Binary Search',
     category: 'searching',

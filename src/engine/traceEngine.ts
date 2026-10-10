@@ -13,7 +13,8 @@ import {
   generateLinearSearchTrace, 
   generateBinarySearchTrace, 
   generateJumpSearchTrace, 
-  generateInterpolationSearchTrace 
+  generateInterpolationSearchTrace,
+  generateSentinelSearchTrace
 } from './searching/searchingAlgorithms';
 
 export interface TraceResult {
@@ -69,6 +70,9 @@ export function executeAlgorithmTrace(
         break;
       case 'binary-search':
         events = generateBinarySearchTrace(data, searchTarget);
+        break;
+      case 'sentinel-search':
+        events = generateSentinelSearchTrace(data, searchTarget);
         break;
       case 'jump-search':
         events = generateJumpSearchTrace(data, searchTarget);

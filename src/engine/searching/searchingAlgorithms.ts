@@ -450,3 +450,162 @@ export function generateInterpolationSearchTrace(initialArray: number[], target:
 
   return events;
 }
+
+export function generateSentinelSearchTrace(initialArray: number[], target: number): TraceEvent[] {
+  const events: TraceEvent[] = [];
+  const arr = [...initialArray];
+  const n = arr.length;
+  let comparisons = 0;
+  let accesses = 0;
+  let writes = 0;
+
+  events.push({
+    id: events.length,
+    type: 'START',
+    operationName: `Start Sentinel Linear Search for Target = ${target}`,
+    beginnerExplanation: `Starting Sentinel Linear Search for ${target}. By placing the target at the end as a 'sentinel', the loop never has to check array bounds (i < n) at every step!`,
+    technicalExplanation: `Sentinel Search initialized. Overwrites the last element arr[${n - 1}] with target ${target} to eliminate loop index condition check, reducing comparison operations by ~50%. Time O(n), Space O(1).`,
+    arraySnapshot: [...arr],
+    codeLineKey: 'sentinel_start',
+    variables: { target, n },
+    comparisonsCount: comparisons,
+    swapsCount: 0,
+    writesCount: writes,
+    accessesCount: accesses,
+  });
+
+  if (n === 0) {
+    events.push({
+      id: events.length,
+      type: 'TARGET_NOT_FOUND',
+      operationName: `Empty array: Target ${target} not found`,
+      beginnerExplanation: `Array is empty, search terminated immediately.`,
+      technicalExplanation: `Array size N = 0. Returning -1.`,
+      arraySnapshot: [],
+      codeLineKey: 'sentinel_not_found',
+      variables: { foundIndex: -1 },
+      comparisonsCount: comparisons,
+      swapsCount: 0,
+      writesCount: writes,
+      accessesCount: accesses,
+    });
+    return events;
+  }
+
+  // Save the last element
+  const lastVal = arr[n - 1];
+  accesses++;
+
+  // Set sentinel
+  arr[n - 1] = target;
+  writes++;
+
+  events.push({
+    id: events.length,
+    type: 'OVERWRITE',
+    operationName: `Set Sentinel at index ${n - 1}: arr[${n - 1}] = ${target} (Original: ${lastVal})`,
+    beginnerExplanation: `Temporarily replaced the last element (${lastVal}) with our target value (${target}). This guarantees the search loop will find ${target} without needing an 'i < n' boundary check.`,
+    technicalExplanation: `Saved original last element (${lastVal}). Injected sentinel arr[${n - 1}] = ${target}. Loop condition simplifies to while (arr[i] !== target).`,
+    indices: [n - 1],
+    values: [target, lastVal],
+    pivotIndex: n - 1,
+    arraySnapshot: [...arr],
+    codeLineKey: 'sentinel_place',
+    variables: { lastVal, sentinelIndex: n - 1, target },
+    comparisonsCount: comparisons,
+    swapsCount: 0,
+    writesCount: writes,
+    accessesCount: accesses,
+  });
+
+  let i = 0;
+  while (arr[i] !== target) {
+    comparisons++;
+    accesses++;
+    events.push({
+      id: events.length,
+      type: 'SEARCH_EXAMINE',
+      operationName: `Check arr[${i}] (${arr[i]}) === target (${target}) [No bound check needed!]`,
+      beginnerExplanation: `Inspecting index ${i} with value ${arr[i]}. It is not equal to ${target}. Moving to next index without checking if i < ${n}.`,
+      technicalExplanation: `Only 1 comparison executed per iteration (value equality) rather than 2 (index bound check + value equality).`,
+      indices: [i],
+      values: [arr[i], target],
+      pivotIndex: n - 1,
+      arraySnapshot: [...arr],
+      codeLineKey: 'sentinel_loop',
+      variables: { i, 'arr[i]': arr[i], target },
+      comparisonsCount: comparisons,
+      swapsCount: 0,
+      writesCount: writes,
+      accessesCount: accesses,
+    });
+    i++;
+  }
+
+  // Loop termination comparison
+  comparisons++;
+  accesses++;
+
+  // Restore the original element
+  arr[n - 1] = lastVal;
+  writes++;
+
+  events.push({
+    id: events.length,
+    type: 'OVERWRITE',
+    operationName: `Loop stopped at index ${i}. Restore original arr[${n - 1}] = ${lastVal}`,
+    beginnerExplanation: `The search hit ${target} at index ${i}! Now we restore the original element (${lastVal}) at the end.`,
+    technicalExplanation: `Exited sentinel loop. Restored arr[${n - 1}] = original (${lastVal}). Now verifying if match was before sentinel or was the original last element.`,
+    indices: [n - 1],
+    values: [lastVal],
+    arraySnapshot: [...arr],
+    codeLineKey: 'sentinel_restore',
+    variables: { stopIndex: i, restoredLastVal: lastVal },
+    comparisonsCount: comparisons,
+    swapsCount: 0,
+    writesCount: writes,
+    accessesCount: accesses,
+  });
+
+  // Verify match
+  comparisons++;
+  const found = i < n - 1 || lastVal === target;
+
+  if (found) {
+    events.push({
+      id: events.length,
+      type: 'TARGET_FOUND',
+      operationName: `Target ${target} verified at index ${i}!`,
+      beginnerExplanation: `Target ${target} was found at index ${i}! Sentinel Search succeeded in fewer CPU cycles.`,
+      technicalExplanation: `Condition (i < n - 1 || lastVal === target) evaluated to true. Returning index ${i}. Total comparisons: ${comparisons}.`,
+      indices: [i],
+      sortedIndices: [i],
+      values: [target],
+      arraySnapshot: [...arr],
+      codeLineKey: 'sentinel_found',
+      variables: { foundIndex: i, comparisons, totalWrites: writes },
+      comparisonsCount: comparisons,
+      swapsCount: 0,
+      writesCount: writes,
+      accessesCount: accesses,
+    });
+  } else {
+    events.push({
+      id: events.length,
+      type: 'TARGET_NOT_FOUND',
+      operationName: `Target ${target} not found in array`,
+      beginnerExplanation: `The loop only stopped because it hit the sentinel we planted at the end. The original dataset does not contain ${target}.`,
+      technicalExplanation: `Sentinel was reached at index ${n - 1} and original arr[${n - 1}] (${lastVal}) !== target (${target}). Target absent. Returning -1.`,
+      arraySnapshot: [...arr],
+      codeLineKey: 'sentinel_not_found',
+      variables: { foundIndex: -1, comparisons },
+      comparisonsCount: comparisons,
+      swapsCount: 0,
+      writesCount: writes,
+      accessesCount: accesses,
+    });
+  }
+
+  return events;
+}
+
