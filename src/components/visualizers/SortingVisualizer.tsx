@@ -20,10 +20,23 @@ export const SortingVisualizer: React.FC = () => {
   const sortedIndices = currentEvent.sortedIndices || [];
   const pivotIndex = currentEvent.pivotIndex;
 
-  // Max value calculation for bar height scale
-  const maxAbsValue = Math.max(...array.map(Math.abs), 1);
-  const minVal = Math.min(...array);
-  const hasNegatives = minVal < 0;
+  // Min and max value calculation for accurate proportional bar height
+  const minVal = array.length > 0 ? Math.min(...array) : 0;
+  const maxVal = array.length > 0 ? Math.max(...array) : 1;
+
+  const calculateBarHeight = (value: number): number => {
+    if (minVal >= 0) {
+      if (maxVal <= 0) return 30;
+      // Proportional to value relative to maximum value
+      const proportional = (value / maxVal) * 90;
+      return Math.max(3, Math.round(proportional));
+    } else {
+      // Linear scaling across range for negative numbers
+      const range = maxVal - minVal;
+      if (range === 0) return 50;
+      return Math.max(3, Math.round(3 + ((value - minVal) / range) * 87));
+    }
+  };
 
   return (
     <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 sm:p-6 shadow-inner relative flex flex-col justify-between min-h-[360px] overflow-hidden">
@@ -67,8 +80,8 @@ export const SortingVisualizer: React.FC = () => {
           const isSorted = sortedIndices.includes(idx);
           const isInSecondaryRange = secondaryIndices.length === 2 && idx >= secondaryIndices[0] && idx <= secondaryIndices[1];
 
-          // Height percentage
-          const heightPercent = Math.max(12, Math.round((Math.abs(value) / maxAbsValue) * 85));
+          // Accurate bar height directly proportional to value
+          const heightPercent = calculateBarHeight(value);
 
           // Determine bar styling & status icon
           let barBg = 'bg-zinc-800 hover:bg-zinc-750 text-zinc-300 border-zinc-700';

@@ -97,7 +97,19 @@ export const CompareView: React.FC = () => {
   const ev2 = trace2.events[step2] || trace2.events[0];
   const ev3 = trace3.events[step3] || trace3.events[0];
 
-  const maxVal = Math.max(...data.map(Math.abs), 1);
+  const minDataVal = data.length > 0 ? Math.min(...data) : 0;
+  const maxDataVal = data.length > 0 ? Math.max(...data) : 1;
+
+  const calculateMiniBarHeight = (val: number): number => {
+    if (minDataVal >= 0) {
+      if (maxDataVal <= 0) return 30;
+      return Math.max(3, Math.round((val / maxDataVal) * 92));
+    } else {
+      const range = maxDataVal - minDataVal;
+      if (range === 0) return 50;
+      return Math.max(3, Math.round(3 + ((val - minDataVal) / range) * 89));
+    }
+  };
 
   const renderMiniBars = (event: typeof ev1) => {
     if (!event) return null;
@@ -106,12 +118,12 @@ export const CompareView: React.FC = () => {
     const sortedIndices = event.sortedIndices || [];
 
     return (
-      <div className="flex items-end justify-center gap-1 h-32 px-2 py-3 bg-zinc-950 rounded-lg border border-zinc-800">
+      <div className="flex items-end justify-center gap-0.5 sm:gap-1 h-32 px-1 sm:px-2 py-3 bg-zinc-950 rounded-lg border border-zinc-800 overflow-x-auto max-w-full">
         {arr.map((val, idx) => {
           const isComparing = event.type === 'COMPARE' && indices.includes(idx);
           const isSwapping = (event.type === 'SWAP' || event.type === 'OVERWRITE') && indices.includes(idx);
           const isSorted = sortedIndices.includes(idx);
-          const heightPercent = Math.max(10, Math.round((Math.abs(val) / maxVal) * 90));
+          const heightPercent = calculateMiniBarHeight(val);
 
           let bg = 'bg-zinc-800';
           if (isSwapping) bg = 'bg-rose-500';
@@ -122,7 +134,7 @@ export const CompareView: React.FC = () => {
             <div
               key={idx}
               style={{ height: `${heightPercent}%` }}
-              className={`flex-1 rounded-t-xs transition-all ${bg}`}
+              className={`flex-1 min-w-[8px] rounded-t-xs transition-all ${bg}`}
               title={`[${idx}]: ${val}`}
             />
           );
