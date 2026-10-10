@@ -36,7 +36,8 @@ export const GraphVisualizer: React.FC = () => {
     playGraph,
     pauseGraph,
     resetGraph,
-    runGraphAlgorithm
+    runGraphAlgorithm,
+    theme
   } = useAlgoStore();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -375,13 +376,13 @@ export const GraphVisualizer: React.FC = () => {
                       width="20"
                       height="18"
                       rx="4"
-                      fill="#18181b"
-                      stroke="#27272a"
+                      fill={theme === 'light' ? '#ffffff' : '#18181b'}
+                      stroke={theme === 'light' ? '#cbd5e1' : '#27272a'}
                     />
                     <text
                       textAnchor="middle"
                       dy="4"
-                      fill="#a1a1aa"
+                      fill={theme === 'light' ? '#475569' : '#a1a1aa'}
                       fontSize="10"
                       fontWeight="bold"
                     >
@@ -399,18 +400,18 @@ export const GraphVisualizer: React.FC = () => {
             const isVisited = currentStep?.visitedNodes?.includes(node.id);
             const isConnecting = sourceForEdge === node.id;
 
-            let fill = '#18181b';
-            let stroke = '#52525b';
-            let textColor = '#e4e4e7';
+            let fill = theme === 'light' ? '#f1f5f9' : '#18181b';
+            let stroke = theme === 'light' ? '#94a3b8' : '#52525b';
+            let textColor = theme === 'light' ? '#0f172a' : '#e4e4e7';
 
             if (isActive) {
-              fill = '#0891b2';
-              stroke = '#22d3ee';
+              fill = '#0284c7';
+              stroke = '#38bdf8';
               textColor = '#ffffff';
             } else if (isVisited) {
-              fill = '#064e3b';
+              fill = theme === 'light' ? '#d1fae5' : '#064e3b';
               stroke = '#10b981';
-              textColor = '#a7f3d0';
+              textColor = theme === 'light' ? '#065f46' : '#a7f3d0';
             } else if (isConnecting) {
               stroke = '#f59e0b';
             }

@@ -59,8 +59,15 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPlaying, play, pause, stepForward, stepBackward, restart]);
 
+  // Sync theme class to html document element
+  useEffect(() => {
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(theme);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-zinc-950 text-zinc-100' : 'bg-zinc-100 text-zinc-900'} flex flex-col font-sans transition-colors antialiased`}>
+    <div className={`theme-${theme} min-h-screen ${theme === 'dark' ? 'bg-zinc-950 text-zinc-100' : 'bg-slate-50 text-slate-900'} flex flex-col font-sans transition-colors antialiased`}>
       {/* Top Navbar with search and section switches */}
       <Navbar onOpenSettings={() => setSettingsOpen(true)} />
 
