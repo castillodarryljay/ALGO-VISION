@@ -8,7 +8,7 @@ export const SortingVisualizer: React.FC = () => {
 
   if (!currentEvent) {
     return (
-      <div className="h-64 flex items-center justify-center text-zinc-500 font-mono text-sm bg-zinc-950 rounded-xl border border-zinc-800">
+      <div className="h-64 flex items-center justify-center text-slate-400 dark:text-zinc-500 font-mono text-sm glass-panel rounded-3xl border border-white/80 dark:border-white/10">
         No trace events available. Apply input or select an algorithm.
       </div>
     );
@@ -27,52 +27,50 @@ export const SortingVisualizer: React.FC = () => {
   const calculateBarHeight = (value: number): number => {
     if (minVal >= 0) {
       if (maxVal <= 0) return 30;
-      // Proportional to value relative to maximum value
       const proportional = (value / maxVal) * 90;
-      return Math.max(3, Math.round(proportional));
+      return Math.max(4, Math.round(proportional));
     } else {
-      // Linear scaling across range for negative numbers
       const range = maxVal - minVal;
       if (range === 0) return 50;
-      return Math.max(3, Math.round(3 + ((value - minVal) / range) * 87));
+      return Math.max(4, Math.round(4 + ((value - minVal) / range) * 86));
     }
   };
 
   return (
-    <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 sm:p-6 shadow-inner relative flex flex-col justify-between min-h-[360px] overflow-hidden">
+    <div className="glass-panel rounded-3xl p-5 sm:p-6 shadow-sm relative flex flex-col justify-between min-h-[380px] overflow-hidden border border-white/80 dark:border-white/10">
       
       {/* Legend & Active status bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800/80 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-black/[0.06] dark:border-white/[0.08] text-xs">
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-zinc-300">Operation:</span>
-          <span className="px-2 py-0.5 rounded-md font-mono bg-zinc-800 text-cyan-300 border border-zinc-700/60">
+          <span className="font-semibold text-slate-700 dark:text-zinc-300">Operation:</span>
+          <span className="px-3 py-1 rounded-full font-mono bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 font-medium backdrop-blur-md">
             {currentEvent.operationName}
           </span>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-400">
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-xs bg-amber-400"></span>
+        {/* Legend with Apple iOS glass capsules */}
+        <div className="flex flex-wrap items-center gap-2.5 text-[11px] text-slate-600 dark:text-zinc-400 font-medium">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-amber-400 shadow-xs"></span>
             <span>Comparing</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-xs bg-rose-500"></span>
-            <span>Swapping / Shift</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-rose-500 shadow-xs"></span>
+            <span>Swapping</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-xs bg-cyan-400"></span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-300 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-xs"></span>
             <span>Pivot / Key</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-xs bg-emerald-500"></span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-xs"></span>
             <span>Sorted</span>
           </div>
         </div>
       </div>
 
       {/* Bars Canvas Container */}
-      <div className="flex-1 flex items-end justify-center gap-0.5 sm:gap-2 px-1 sm:px-2 py-4 h-56 min-h-[220px] overflow-x-auto max-w-full">
+      <div className="flex-1 flex items-end justify-center gap-1 sm:gap-2 px-1 sm:px-3 py-6 h-60 min-h-[240px] overflow-x-auto max-w-full">
         {array.map((value, idx) => {
           const isComparing = currentEvent.type === 'COMPARE' && indices.includes(idx);
           const isSwapping = (currentEvent.type === 'SWAP' || currentEvent.type === 'OVERWRITE') && indices.includes(idx);
@@ -84,60 +82,60 @@ export const SortingVisualizer: React.FC = () => {
           const heightPercent = calculateBarHeight(value);
 
           // Determine bar styling & status icon
-          let barBg = 'bg-zinc-800 hover:bg-zinc-750 text-zinc-300 border-zinc-700';
+          let barBg = 'bg-gradient-to-t from-slate-400 to-slate-300 dark:from-slate-700 dark:to-slate-600 text-slate-800 dark:text-white shadow-2xs';
           let statusBadge = null;
 
           if (isSwapping) {
-            barBg = 'bg-rose-500 text-white border-rose-400 shadow-md shadow-rose-950/50 ring-2 ring-rose-400/40';
-            statusBadge = <ArrowLeftRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white animate-pulse" />;
+            barBg = 'bg-gradient-to-t from-rose-600 to-rose-500 text-white shadow-lg shadow-rose-500/30 ring-2 ring-rose-400/50 scale-[1.02]';
+            statusBadge = <ArrowLeftRight className="w-3 h-3 text-white animate-pulse" />;
           } else if (isComparing) {
-            barBg = 'bg-amber-400 text-zinc-950 border-amber-300 shadow-md shadow-amber-950/50 ring-2 ring-amber-400/40 font-bold';
-            statusBadge = <Eye className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-zinc-950" />;
+            barBg = 'bg-gradient-to-t from-amber-500 to-amber-400 text-amber-950 shadow-lg shadow-amber-400/30 ring-2 ring-amber-400/50 scale-[1.02] font-bold';
+            statusBadge = <Eye className="w-3 h-3 text-amber-950" />;
           } else if (isPivot) {
-            barBg = 'bg-cyan-500 text-zinc-950 border-cyan-400 shadow-md shadow-cyan-950/50 ring-2 ring-cyan-400/40 font-bold';
-            statusBadge = <Target className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-zinc-950" />;
+            barBg = 'bg-gradient-to-t from-cyan-600 to-cyan-400 text-white shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-400/50 scale-[1.02] font-bold';
+            statusBadge = <Target className="w-3 h-3 text-white" />;
           } else if (isSorted) {
-            barBg = 'bg-emerald-500/80 text-white border-emerald-400/60 shadow-xs shadow-emerald-950/30';
-            statusBadge = <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />;
+            barBg = 'bg-gradient-to-t from-emerald-600 to-emerald-500 text-white shadow-md shadow-emerald-500/20';
+            statusBadge = <Check className="w-3 h-3 text-white" />;
           } else if (isInSecondaryRange) {
-            barBg = 'bg-zinc-700 text-zinc-200 border-zinc-600';
+            barBg = 'bg-gradient-to-t from-indigo-500/70 to-indigo-400/70 text-white shadow-xs';
           }
 
           return (
             <div
               key={idx}
-              className="flex-1 min-w-[12px] max-w-[48px] flex flex-col items-center justify-end h-full group"
+              className="flex-1 min-w-[14px] max-w-[52px] flex flex-col items-center justify-end h-full group"
             >
               {/* Value indicator on top */}
-              <div className="mb-1 flex flex-col items-center">
+              <div className="mb-1.5 flex flex-col items-center">
                 {statusBadge && <div className="mb-0.5">{statusBadge}</div>}
-                <span className={`text-[9px] sm:text-xs font-mono font-semibold transition-colors ${
-                  isComparing ? 'text-amber-400 scale-110' :
-                  isSwapping ? 'text-rose-400 scale-110' :
-                  isPivot ? 'text-cyan-400 scale-110' :
-                  isSorted ? 'text-emerald-400' : 'text-zinc-400'
+                <span className={`text-[10px] sm:text-xs font-mono font-semibold transition-all ${
+                  isComparing ? 'text-amber-600 dark:text-amber-300 scale-110 font-bold' :
+                  isSwapping ? 'text-rose-600 dark:text-rose-300 scale-110 font-bold' :
+                  isPivot ? 'text-cyan-600 dark:text-cyan-300 scale-110 font-bold' :
+                  isSorted ? 'text-emerald-600 dark:text-emerald-300' : 'text-slate-600 dark:text-zinc-400'
                 }`}>
                   {value}
                 </span>
               </div>
 
-              {/* Bar Element */}
+              {/* Bar Element with Apple Liquid Glass rounded pill-top */}
               <div
                 style={{ height: `${heightPercent}%` }}
-                className={`w-full rounded-t-md border-t border-x flex items-center justify-center transition-all ${
+                className={`w-full rounded-t-xl flex items-center justify-center transition-all ${
                   reducedMotion ? 'duration-0' : 'duration-300'
                 } ${barBg}`}
               >
                 {/* Embedded value for taller bars on desktop */}
-                {heightPercent > 35 && (
-                  <span className="text-[9px] font-mono opacity-80 select-none hidden sm:inline">
+                {heightPercent > 32 && (
+                  <span className="text-[10px] font-mono font-bold select-none hidden sm:inline opacity-90">
                     {value}
                   </span>
                 )}
               </div>
 
               {/* Index label underneath */}
-              <div className="mt-1 text-[9px] sm:text-[11px] font-mono text-zinc-500 select-none">
+              <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono text-slate-400 dark:text-zinc-500 select-none">
                 [{idx}]
               </div>
             </div>
@@ -147,7 +145,7 @@ export const SortingVisualizer: React.FC = () => {
 
       {/* Subarray Range Bounds indicator if present */}
       {secondaryIndices.length === 2 && (
-        <div className="mt-2 text-center text-xs text-zinc-400 font-mono">
+        <div className="mt-2 text-center text-xs text-slate-500 dark:text-zinc-400 font-mono">
           Active Subarray Window: [{secondaryIndices[0]}..{secondaryIndices[1]}]
         </div>
       )}

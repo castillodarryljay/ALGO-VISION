@@ -3,17 +3,11 @@ import { useAlgoStore } from '../../store/useAlgoStore';
 import { SupportedLanguage } from '../../types/algorithm';
 import { getAlgorithmCode } from '../../codeRegistry/codeRegistry';
 import { 
-  Code2, 
   Copy, 
   Check, 
   Download, 
-  Play, 
   ZoomIn, 
-  ZoomOut, 
-  Eye, 
-  EyeOff, 
-  Terminal,
-  AlertCircle
+  ZoomOut
 } from 'lucide-react';
 
 export const CodePanel: React.FC = () => {
@@ -24,19 +18,10 @@ export const CodePanel: React.FC = () => {
     traceResult, 
     currentStepIndex,
     codeFontSize,
-    setCodeFontSize,
-    showComments,
-    setShowComments
+    setCodeFontSize
   } = useAlgoStore();
 
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'viewer' | 'runner'>('viewer');
-
-  // Sandbox runner state
-  const [editableCode, setEditableCode] = useState<string>('');
-  const [runnerOutput, setRunnerOutput] = useState<string>('');
-  const [runnerError, setRunnerError] = useState<string | null>(null);
-  const [isRunning, setIsRunning] = useState(false);
 
   const codeData = getAlgorithmCode(selectedAlgorithmId, language);
   const currentEvent = traceResult.events[currentStepIndex];
@@ -73,75 +58,24 @@ export const CodePanel: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleRunSandbox = () => {
-    setIsRunning(true);
-    setRunnerError(null);
-    setRunnerOutput('');
-
-    const capturedLogs: string[] = [];
-    const originalLog = console.log;
-
-    try {
-      const codeToRun = editableCode || (codeData?.language === 'javascript' ? codeData.code : '');
-      if (!codeToRun) {
-        setRunnerError('No executable JavaScript code provided.');
-        setIsRunning(false);
-        return;
-      }
-
-      // Safe evaluation sandbox
-      const testCode = `
-        let output = [];
-        const customLog = (...args) => output.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
-        ${codeToRun}
-        if (typeof bubbleSort === 'function') {
-          customLog("Running bubbleSort([45, 12, 85, 32]):", bubbleSort([45, 12, 85, 32]));
-        } else if (typeof mergeSort === 'function') {
-          let testArr = [38, 27, 43, 3, 9];
-          mergeSort(testArr, 0, testArr.length - 1);
-          customLog("Running mergeSort on [38, 27, 43, 3, 9]:", testArr);
-        } else if (typeof quickSort === 'function') {
-          let testArr = [64, 25, 12, 22];
-          quickSort(testArr, 0, testArr.length - 1);
-          customLog("Running quickSort on [64, 25, 12, 22]:", testArr);
-        } else if (typeof binarySearch === 'function') {
-          customLog("Running binarySearch([4, 11, 19, 25, 33], 19):", binarySearch([4, 11, 19, 25, 33], 19));
-        } else {
-          customLog("Script executed successfully. Function defined.");
-        }
-        return output.join('\\n');
-      `;
-
-      const fn = new Function(testCode);
-      const startTime = performance.now();
-      const res = fn();
-      const elapsed = Math.round((performance.now() - startTime) * 100) / 100;
-      setRunnerOutput(`${res}\n\n[Process completed in ${elapsed}ms]`);
-    } catch (err: any) {
-      setRunnerError(err.message || 'Execution error');
-    } finally {
-      setIsRunning(false);
-    }
-  };
-
   const lines = codeData ? codeData.code.split('\n') : [];
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-sm text-xs flex flex-col h-[520px]">
+    <div className="glass-card rounded-3xl border border-white/80 dark:border-white/10 shadow-sm text-xs flex flex-col h-[520px] overflow-hidden">
       
       {/* Top Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-b border-zinc-800 bg-zinc-950/80 rounded-t-xl">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03]">
         
-        {/* Language Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto max-w-full">
+        {/* Language Tabs - Apple iOS Segmented Picker */}
+        <div className="flex items-center gap-1 bg-black/[0.03] dark:bg-white/[0.05] p-1 rounded-2xl border border-black/[0.04] dark:border-white/[0.06] overflow-x-auto max-w-full backdrop-blur-md">
           {languages.map(lang => (
             <button
               key={lang.id}
               onClick={() => setLanguage(lang.id)}
-              className={`px-2.5 py-1 rounded-md font-medium text-xs transition-colors shrink-0 ${
+              className={`px-3 py-1 rounded-xl font-semibold text-xs transition-all shrink-0 active:scale-95 ${
                 language === lang.id
-                  ? 'bg-zinc-800 text-cyan-400 border border-zinc-700/80 shadow-xs'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                  ? 'bg-white dark:bg-white/15 text-cyan-600 dark:text-cyan-300 shadow-sm border border-black/5 dark:border-white/10'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {lang.label}
@@ -155,14 +89,14 @@ export const CodePanel: React.FC = () => {
           <button
             onClick={() => setCodeFontSize(Math.min(18, codeFontSize + 1))}
             title="Increase font size"
-            className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200"
+            className="p-1.5 rounded-xl hover:bg-black/[0.05] dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setCodeFontSize(Math.max(10, codeFontSize - 1))}
             title="Decrease font size"
-            className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200"
+            className="p-1.5 rounded-xl hover:bg-black/[0.05] dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
@@ -171,17 +105,17 @@ export const CodePanel: React.FC = () => {
           <button
             onClick={handleCopy}
             title="Copy source code"
-            className="flex items-center gap-1 px-2 py-1 rounded hover:bg-zinc-800 text-zinc-300 hover:text-white"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl glass-subtle text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline font-medium">{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
           {/* Download Button */}
           <button
             onClick={handleDownload}
             title="Download source file"
-            className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200"
+            className="p-1.5 rounded-xl hover:bg-black/[0.05] dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
           </button>
@@ -192,7 +126,7 @@ export const CodePanel: React.FC = () => {
       {codeData ? (
         <div 
           style={{ fontSize: `${codeFontSize}px` }}
-          className="flex-1 overflow-auto font-mono bg-zinc-950 p-2 sm:p-3 leading-relaxed text-zinc-300 select-text"
+          className="flex-1 overflow-auto font-mono bg-white/60 dark:bg-black/40 p-3 sm:p-4 leading-relaxed text-slate-800 dark:text-zinc-200 select-text backdrop-blur-sm"
         >
           {lines.map((lineContent, lineIdx) => {
             const lineNum = lineIdx + 1;
@@ -201,15 +135,15 @@ export const CodePanel: React.FC = () => {
             return (
               <div
                 key={lineIdx}
-                className={`flex items-start transition-colors px-1 py-0.5 rounded ${
+                className={`flex items-start transition-colors px-2 py-0.5 rounded-lg ${
                   isHighlighted
-                    ? 'bg-cyan-950/90 text-cyan-200 font-bold border-l-4 border-cyan-400 ring-1 ring-cyan-500/30'
-                    : 'hover:bg-zinc-900/40 text-zinc-300'
+                    ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-950 dark:text-cyan-100 font-bold border-l-3 border-cyan-500 shadow-xs'
+                    : 'hover:bg-black/[0.02] dark:hover:bg-white/[0.03]'
                 }`}
               >
                 {/* Line number */}
                 <span className={`w-8 shrink-0 text-right pr-3 select-none text-[11px] ${
-                  isHighlighted ? 'text-cyan-400 font-bold' : 'text-zinc-600'
+                  isHighlighted ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'text-slate-400 dark:text-zinc-600'
                 }`}>
                   {lineNum}
                 </span>
@@ -223,45 +157,17 @@ export const CodePanel: React.FC = () => {
           })}
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 text-zinc-500 font-mono text-center">
-          <Code2 className="w-8 h-8 text-zinc-700 mb-2" />
-          <span>Implementation in progress for {language} for this specific algorithm.</span>
+        <div className="flex-1 flex items-center justify-center text-slate-400 dark:text-zinc-500">
+          No code available for this algorithm.
         </div>
       )}
 
-      {/* Sandbox Code Runner Footer bar */}
-      <div className="p-2 border-t border-zinc-800 bg-zinc-950 flex items-center justify-between text-xs">
-        <div className="flex items-center gap-2 text-zinc-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span className="text-[11px] font-mono">Sync: Step #{currentStepIndex + 1} → Line {activeLineNumber ?? '–'}</span>
-        </div>
-
-        {language === 'javascript' && (
-          <button
-            onClick={handleRunSandbox}
-            className="flex items-center gap-1.5 px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-cyan-300 border border-zinc-700/80 font-medium"
-          >
-            <Play className="w-3 h-3 fill-cyan-300" />
-            <span>Test Sandbox</span>
-          </button>
-        )}
+      {/* Footer Info */}
+      <div className="px-4 py-2 border-t border-black/[0.06] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] flex items-center justify-between text-[11px] text-slate-500 dark:text-zinc-400">
+        <span>Language: <strong className="text-slate-800 dark:text-zinc-200 uppercase">{language}</strong></span>
+        <span>Line Highlight: {activeLineNumber ? `Line #${activeLineNumber}` : 'Idle'}</span>
       </div>
 
-      {/* Runner Output Overlay if executed */}
-      {runnerOutput && (
-        <div className="p-3 bg-zinc-900 border-t border-zinc-800 font-mono text-[11px] text-zinc-200 max-h-36 overflow-y-auto">
-          <div className="text-zinc-500 uppercase text-[10px] font-sans font-semibold mb-1">Sandbox Console Output:</div>
-          <pre className="whitespace-pre-wrap text-emerald-400">{runnerOutput}</pre>
-        </div>
-      )}
-      {runnerError && (
-        <div className="p-3 bg-rose-950/80 border-t border-rose-800 font-mono text-[11px] text-rose-300">
-          <div className="flex items-center gap-1.5 font-semibold text-rose-400 mb-0.5">
-            <AlertCircle className="w-3.5 h-3.5" /> Error
-          </div>
-          <pre className="whitespace-pre-wrap">{runnerError}</pre>
-        </div>
-      )}
     </div>
   );
 };

@@ -6,13 +6,9 @@ import {
   CheckCircle, 
   XCircle, 
   HelpCircle, 
-  Sparkles, 
-  ArrowRight, 
   Lightbulb, 
   AlertTriangle, 
-  ShieldAlert,
   ChevronRight,
-  Layers,
   Award
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -59,28 +55,30 @@ export const LearningView: React.FC = () => {
     <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 text-xs">
       
       {/* Header */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-panel rounded-3xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-white/80 dark:border-white/10 shadow-sm">
         <div>
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-xl font-bold text-white tracking-tight">AlgoVision Learning Lab</h2>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+              <BookOpen className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">AlgoVision Learning Lab</h2>
           </div>
-          <p className="text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-slate-600 dark:text-zinc-400 mt-2 max-w-2xl leading-relaxed">
             Master fundamental algorithmic principles through interactive lessons, complexity intuitions, 
             pitfall breakdowns, and self-testing quizzes.
           </p>
         </div>
 
-        {/* Difficulty Filters */}
-        <div className="flex items-center gap-1.5 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+        {/* Difficulty Filters - Apple iOS Segmented Control */}
+        <div className="flex items-center gap-1 bg-black/[0.03] dark:bg-white/[0.05] p-1 rounded-2xl border border-black/[0.04] dark:border-white/[0.06] backdrop-blur-md">
           {(['All', 'Beginner', 'Intermediate', 'Advanced'] as const).map(diff => (
             <button
               key={diff}
               onClick={() => setDifficultyFilter(diff)}
-              className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 active:scale-95 ${
                 difficultyFilter === diff
-                  ? 'bg-cyan-600 text-white shadow-xs'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-white dark:bg-white/15 text-cyan-600 dark:text-cyan-300 shadow-sm border border-black/[0.05] dark:border-white/10'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {diff}
@@ -94,220 +92,178 @@ export const LearningView: React.FC = () => {
         
         {/* Left Column: Lesson Index */}
         <div className="lg:col-span-1 space-y-2">
-          <div className="text-[11px] uppercase font-bold text-zinc-500 px-1 mb-2">
+          <div className="text-[11px] uppercase font-bold text-slate-500 dark:text-zinc-400 px-1 mb-2">
             Curriculum Lessons ({filteredLessons.length})
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 max-h-[600px] overflow-y-auto pr-1">
             {filteredLessons.map(lesson => {
-              const isSelected = lesson.id === currentLesson.id;
-              let diffBadgeColor = 'bg-blue-950 text-blue-300 border-blue-800';
-              if (lesson.difficulty === 'Intermediate') diffBadgeColor = 'bg-amber-950 text-amber-300 border-amber-800';
-              if (lesson.difficulty === 'Advanced') diffBadgeColor = 'bg-rose-950 text-rose-300 border-rose-800';
-
+              const isSelected = selectedLessonId === lesson.id;
               return (
-                <div
+                <button
                   key={lesson.id}
-                  onClick={() => {
-                    setSelectedLessonId(lesson.id);
-                    setSelectedAnswers({});
-                    setShowFeedback({});
-                  }}
-                  className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                  onClick={() => setSelectedLessonId(lesson.id)}
+                  className={`w-full text-left p-3.5 rounded-2xl transition-all duration-200 active:scale-98 flex items-center justify-between border ${
                     isSelected
-                      ? 'bg-cyan-950/70 border-cyan-500 text-white shadow-md shadow-cyan-950 ring-1 ring-cyan-500/30'
-                      : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-850'
+                      ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/25 border-white/20'
+                      : 'glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/90 dark:hover:bg-white/10 border-white/80 dark:border-white/08'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-zinc-400 font-mono">{lesson.category}</span>
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded border font-mono ${diffBadgeColor}`}>
-                      {lesson.difficulty}
-                    </span>
+                  <div>
+                    <div className="font-semibold text-xs line-clamp-1">{lesson.title}</div>
+                    <div className="flex items-center gap-2 mt-1 text-[10px] opacity-80">
+                      <span>{lesson.category}</span>
+                      <span>•</span>
+                      <span>{lesson.difficulty}</span>
+                    </div>
                   </div>
-                  <div className="font-semibold text-xs text-zinc-100">{lesson.title}</div>
-                </div>
+                  <ChevronRight className={`w-4 h-4 shrink-0 transition-transform ${isSelected ? 'translate-x-0.5' : 'opacity-40'}`} />
+                </button>
               );
             })}
           </div>
         </div>
 
-        {/* Right Column: Detailed Lesson Viewer */}
-        <div className="lg:col-span-3 space-y-6">
+        {/* Right Column: Active Lesson Content */}
+        <div className="lg:col-span-3 space-y-4">
           
-          {/* Lesson Hero Banner */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative overflow-hidden shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-800">
-                {currentLesson.difficulty} Level
-              </span>
-              <button
-                onClick={handleLaunchVisualizer}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition-colors shadow-sm"
-              >
-                <span>Open in Visualizer</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
+          {/* Lesson Header Card */}
+          <div className="glass-card rounded-3xl p-6 border border-white/80 dark:border-white/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 backdrop-blur-md">
+                  {currentLesson.category}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 backdrop-blur-md">
+                  {currentLesson.difficulty}
+                </span>
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{currentLesson.title}</h2>
+              <p className="text-xs text-slate-600 dark:text-zinc-400 mt-1">{currentLesson.overview}</p>
             </div>
 
-            <h3 className="text-xl font-bold text-white tracking-tight">{currentLesson.title}</h3>
-            <p className="text-zinc-300 mt-2 text-xs leading-relaxed max-w-2xl">{currentLesson.overview}</p>
+            <button
+              onClick={handleLaunchVisualizer}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs shadow-md shadow-cyan-600/30 shrink-0 active:scale-95 transition-all"
+            >
+              <span>Practice in Visualizer</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Core Idea & Step-by-Step Explanation */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
-            <div>
-              <div className="flex items-center gap-2 text-zinc-200 font-semibold mb-2">
-                <Lightbulb className="w-4 h-4 text-amber-400" />
-                <span>The Core Algorithmic Intuition</span>
-              </div>
-              <p className="text-zinc-300 bg-zinc-950 p-3 rounded-lg border border-zinc-800 leading-relaxed">
-                {currentLesson.coreIdea}
+          {/* Core Concept Breakdown Card */}
+          <div className="glass-card rounded-3xl p-6 border border-white/80 dark:border-white/10 shadow-sm space-y-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Lightbulb className="w-4 h-4 text-amber-500" />
+              <span>Core Concept & How It Works</span>
+            </h3>
+            <p className="text-xs text-slate-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
+              {currentLesson.coreIdea}
+            </p>
+          </div>
+
+          {/* Complexity & Pitfalls Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Complexity Intuition */}
+            <div className="glass-card rounded-3xl p-5 border border-white/80 dark:border-white/10 shadow-sm space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Award className="w-4 h-4 text-cyan-500" />
+                <span>Complexity Intuition</span>
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
+                {currentLesson.complexityAnalysis.intuition}
               </p>
+              <div className="pt-2 text-[11px] font-mono text-slate-500 dark:text-zinc-400">
+                <div>Time: {currentLesson.complexityAnalysis.time}</div>
+                <div>Space: {currentLesson.complexityAnalysis.space}</div>
+              </div>
             </div>
 
-            <div>
-              <div className="flex items-center gap-2 text-zinc-200 font-semibold mb-2">
-                <Layers className="w-4 h-4 text-cyan-400" />
-                <span>Step-by-Step Execution Sequence</span>
-              </div>
-              <div className="space-y-1.5">
-                {currentLesson.stepByStepExplanation.map((step, idx) => (
-                  <div key={idx} className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800/80 text-zinc-300 leading-relaxed">
-                    {step}
+            {/* Common Pitfalls */}
+            <div className="glass-card rounded-3xl p-5 border border-white/80 dark:border-white/10 shadow-sm space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-500" />
+                <span>Common Pitfalls & Mistakes</span>
+              </h3>
+              <div className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed space-y-1">
+                {currentLesson.commonMistakes.map((m, idx) => (
+                  <div key={idx} className="flex items-start gap-1.5">
+                    <span className="text-rose-500 shrink-0">•</span>
+                    <span>{m}</span>
                   </div>
                 ))}
               </div>
             </div>
+
           </div>
 
-          {/* Complexity Breakdown */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
-            <div className="font-semibold text-zinc-200">Complexity Analysis & Theoretical Proof</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
-              <div className="p-3 rounded bg-zinc-950 border border-zinc-800">
-                <div className="text-[10px] text-zinc-500 uppercase font-sans">Time Complexity</div>
-                <div className="text-sm font-bold text-cyan-400 mt-0.5">{currentLesson.complexityAnalysis.time}</div>
-              </div>
-              <div className="p-3 rounded bg-zinc-950 border border-zinc-800">
-                <div className="text-[10px] text-zinc-500 uppercase font-sans">Auxiliary Space Complexity</div>
-                <div className="text-sm font-bold text-amber-400 mt-0.5">{currentLesson.complexityAnalysis.space}</div>
-              </div>
-            </div>
-            <p className="text-zinc-400 text-xs bg-zinc-950 p-3 rounded border border-zinc-800 leading-relaxed font-sans">
-              <strong className="text-zinc-200">Intuition: </strong> {currentLesson.complexityAnalysis.intuition}
-            </p>
-          </div>
+          {/* Interactive Knowledge Check / Questions */}
+          <div className="glass-card rounded-3xl p-6 border border-white/80 dark:border-white/10 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 text-cyan-500" />
+              <span>Knowledge Check & Quick Practice</span>
+            </h3>
 
-          {/* Advantages vs Limitations Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-              <div className="flex items-center gap-1.5 font-semibold text-emerald-400 mb-2">
-                <CheckCircle className="w-4 h-4" />
-                <span>Key Advantages</span>
-              </div>
-              <ul className="space-y-1 text-zinc-300 list-disc list-inside">
-                {currentLesson.advantages.map((adv, i) => (
-                  <li key={i}>{adv}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-              <div className="flex items-center gap-1.5 font-semibold text-rose-400 mb-2">
-                <XCircle className="w-4 h-4" />
-                <span>Limitations & Trade-offs</span>
-              </div>
-              <ul className="space-y-1 text-zinc-300 list-disc list-inside">
-                {currentLesson.limitations.map((lim, i) => (
-                  <li key={i}>{lim}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Common Pitfalls & Mistakes */}
-          <div className="bg-zinc-900 border border-amber-900/60 rounded-xl p-4">
-            <div className="flex items-center gap-1.5 font-semibold text-amber-400 mb-2">
-              <ShieldAlert className="w-4 h-4" />
-              <span>Common Pitfalls & Coding Interview Traps</span>
-            </div>
-            <ul className="space-y-1.5 text-zinc-300">
-              {currentLesson.commonMistakes.map((mistake, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-amber-400 font-bold">⚠</span>
-                  <span>{mistake}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Interactive Practice Questions */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-5">
-            <div className="flex items-center gap-2 font-semibold text-zinc-200 text-sm">
-              <Award className="w-4 h-4 text-cyan-400" />
-              <span>Check Your Understanding (Practice Questions)</span>
-            </div>
-
-            <div className="space-y-6">
-              {currentLesson.questions.map((q, qIdx) => {
-                const userChoice = selectedAnswers[q.id];
-                const isSubmitted = showFeedback[q.id];
-                const isCorrect = userChoice === q.correctIndex;
+            <div className="space-y-4">
+              {currentLesson.questions.map((quiz, qIdx) => {
+                const userChoice = selectedAnswers[quiz.id];
+                const isSubmitted = showFeedback[quiz.id];
+                const isCorrect = userChoice === quiz.correctIndex;
 
                 return (
-                  <div key={q.id} className="p-4 rounded-lg bg-zinc-950 border border-zinc-800 space-y-3">
-                    <div className="font-semibold text-zinc-200">
-                      Q{qIdx + 1}. {q.question}
+                  <div key={quiz.id} className="p-4 rounded-2xl glass-subtle space-y-3">
+                    <div className="font-semibold text-xs text-slate-900 dark:text-white">
+                      {qIdx + 1}. {quiz.question}
                     </div>
 
                     <div className="space-y-1.5">
-                      {q.options.map((opt, optIdx) => {
-                        const isSelected = userChoice === optIdx;
-                        let optionStyle = 'bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300';
-
-                        if (isSelected && !isSubmitted) {
-                          optionStyle = 'bg-cyan-950/80 border-cyan-500 text-cyan-200';
-                        } else if (isSubmitted) {
-                          if (optIdx === q.correctIndex) {
-                            optionStyle = 'bg-emerald-950/90 border-emerald-500 text-emerald-200 font-semibold';
-                          } else if (isSelected && !isCorrect) {
-                            optionStyle = 'bg-rose-950/90 border-rose-500 text-rose-200';
+                      {quiz.options.map((opt, oIdx) => {
+                        const isChosen = userChoice === oIdx;
+                        let optionStyle = 'glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/90 dark:hover:bg-white/10';
+                        if (isSubmitted) {
+                          if (oIdx === quiz.correctIndex) {
+                            optionStyle = 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-200 border-emerald-500/50';
+                          } else if (isChosen) {
+                            optionStyle = 'bg-rose-500/20 text-rose-800 dark:text-rose-200 border-rose-500/50';
                           }
+                        } else if (isChosen) {
+                          optionStyle = 'bg-cyan-500/20 text-cyan-800 dark:text-cyan-200 border-cyan-500/50';
                         }
 
                         return (
                           <button
-                            key={optIdx}
-                            onClick={() => !isSubmitted && handleSelectAnswer(q.id, optIdx)}
-                            className={`w-full text-left p-2.5 rounded-lg border text-xs transition-colors flex items-center justify-between ${optionStyle}`}
+                            key={oIdx}
+                            disabled={isSubmitted}
+                            onClick={() => handleSelectAnswer(quiz.id, oIdx)}
+                            className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 border ${optionStyle}`}
                           >
-                            <span>{opt}</span>
-                            {isSubmitted && optIdx === q.correctIndex && (
-                              <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                            )}
-                            {isSubmitted && isSelected && !isCorrect && (
-                              <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                            )}
+                            {opt}
                           </button>
                         );
                       })}
                     </div>
 
-                    {!isSubmitted ? (
-                      <button
-                        onClick={() => userChoice !== undefined && handleCheckAnswer(q.id, q.correctIndex)}
-                        disabled={userChoice === undefined}
-                        className="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium text-xs shadow-xs"
-                      >
-                        Submit Answer
-                      </button>
-                    ) : (
-                      <div className={`p-3 rounded-lg border text-xs leading-relaxed ${
-                        isCorrect ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300' : 'bg-rose-950/60 border-rose-800 text-rose-300'
-                      }`}>
-                        <strong>{isCorrect ? '✓ Correct!' : '✗ Incorrect.'} </strong>
-                        {q.explanation}
+                    <div className="flex items-center justify-between pt-1">
+                      {!isSubmitted ? (
+                        <button
+                          disabled={userChoice === undefined}
+                          onClick={() => handleCheckAnswer(quiz.id, quiz.correctIndex)}
+                          className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs disabled:opacity-40 transition-all shadow-sm active:scale-95"
+                        >
+                          Check Answer
+                        </button>
+                      ) : (
+                        <div className={`flex items-center gap-1.5 text-xs font-semibold ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                          {isCorrect ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                          <span>{isCorrect ? 'Correct!' : 'Incorrect'}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {isSubmitted && (
+                      <div className="p-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.04] text-[11px] text-slate-600 dark:text-zinc-400 leading-relaxed border border-black/[0.04] dark:border-white/[0.06]">
+                        {quiz.explanation}
                       </div>
                     )}
                   </div>

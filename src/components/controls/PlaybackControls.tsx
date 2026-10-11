@@ -6,8 +6,7 @@ import {
   ChevronLeft, 
   ChevronRight, 
   FastForward, 
-  Gauge, 
-  Sliders
+  Gauge
 } from 'lucide-react';
 import { useAlgoStore } from '../../store/useAlgoStore';
 
@@ -65,24 +64,26 @@ export const PlaybackControls: React.FC = () => {
   ];
 
   return (
-    <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-3 sm:p-4 shadow-lg backdrop-blur-sm">
+    <div className="glass-panel rounded-3xl p-4 sm:p-5 shadow-lg border border-white/80 dark:border-white/10">
       {/* Timeline Slider & Step Count */}
-      <div className="flex flex-col gap-2 mb-3">
-        <div className="flex items-center justify-between text-xs text-zinc-400">
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex items-center justify-between text-xs text-slate-600 dark:text-zinc-400">
           <div className="flex items-center gap-2">
-            <span className="font-mono font-medium text-zinc-200">
-              Step <span className="text-cyan-400">{totalSteps > 0 ? currentStepIndex + 1 : 0}</span> / {totalSteps}
+            <span className="font-mono font-medium text-slate-800 dark:text-zinc-200">
+              Step <span className="text-cyan-600 dark:text-cyan-400 font-bold">{totalSteps > 0 ? currentStepIndex + 1 : 0}</span> / {totalSteps}
             </span>
             {totalSteps > 0 && currentStepIndex === totalSteps - 1 && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800/80">Completed</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-medium backdrop-blur-md">
+                Completed
+              </span>
             )}
           </div>
-          <span className="font-mono text-[11px] text-zinc-500">
+          <span className="font-mono text-[11px] text-slate-500 dark:text-zinc-500 font-semibold">
             {totalSteps > 0 ? Math.round(((currentStepIndex + 1) / totalSteps) * 100) : 0}%
           </span>
         </div>
 
-        {/* Timeline Slider */}
+        {/* Apple iOS Smooth Seekbar */}
         <input
           type="range"
           min={0}
@@ -94,7 +95,7 @@ export const PlaybackControls: React.FC = () => {
           }}
           disabled={totalSteps <= 1}
           aria-label="Timeline seek"
-          className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 focus:outline-none"
+          className="w-full h-2 bg-black/[0.06] dark:bg-white/[0.08] rounded-full appearance-none cursor-pointer accent-cyan-500 focus:outline-none transition-all"
         />
       </div>
 
@@ -102,12 +103,12 @@ export const PlaybackControls: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3">
         
         {/* Playback Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-2">
           {/* Restart */}
           <button
             onClick={restart}
             title="Restart from beginning"
-            className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors border border-zinc-700/60"
+            className="p-2.5 rounded-2xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95 shadow-2xs"
             aria-label="Restart"
           >
             <RotateCcw className="w-4 h-4" />
@@ -118,7 +119,7 @@ export const PlaybackControls: React.FC = () => {
             onClick={stepBackward}
             disabled={currentStepIndex <= 0}
             title="Step Backward"
-            className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-zinc-700/60"
+            className="p-2.5 rounded-2xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-2xs"
             aria-label="Previous step"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -128,17 +129,17 @@ export const PlaybackControls: React.FC = () => {
           {isPlaying ? (
             <button
               onClick={pause}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/50 font-medium text-xs transition-colors shadow-sm"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-amber-500/15 text-amber-800 dark:text-amber-200 hover:bg-amber-500/25 border border-amber-500/40 font-semibold text-xs transition-all shadow-md active:scale-95"
               aria-label="Pause execution"
             >
-              <Pause className="w-4 h-4 fill-amber-300" />
+              <Pause className="w-4 h-4 fill-current" />
               <span>Pause</span>
             </button>
           ) : (
             <button
               onClick={play}
               disabled={totalSteps === 0 || currentStepIndex >= totalSteps - 1}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-xs transition-colors shadow-sm shadow-cyan-950"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs transition-all shadow-lg shadow-cyan-600/30 active:scale-95"
               aria-label="Play execution"
             >
               <Play className="w-4 h-4 fill-white" />
@@ -151,7 +152,7 @@ export const PlaybackControls: React.FC = () => {
             onClick={stepForward}
             disabled={currentStepIndex >= totalSteps - 1}
             title="Step Forward"
-            className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-zinc-700/60"
+            className="p-2.5 rounded-2xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-2xs"
             aria-label="Next step"
           >
             <ChevronRight className="w-4 h-4" />
@@ -162,31 +163,31 @@ export const PlaybackControls: React.FC = () => {
             onClick={skipToEnd}
             disabled={currentStepIndex >= totalSteps - 1}
             title="Skip to End"
-            className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-zinc-700/60"
+            className="p-2.5 rounded-2xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-2xs"
             aria-label="Skip to end"
           >
             <FastForward className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Speed Controls */}
+        {/* Speed Controls - Apple iOS Segmented Picker */}
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-zinc-400">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400">
             <Gauge className="w-3.5 h-3.5" />
-            <span>Speed:</span>
+            <span className="font-medium">Speed:</span>
           </div>
 
-          <div className="inline-flex rounded-lg bg-zinc-800/80 p-0.5 border border-zinc-700/60">
+          <div className="inline-flex rounded-2xl bg-black/[0.03] dark:bg-white/[0.05] p-1 border border-black/[0.04] dark:border-white/[0.06] backdrop-blur-md">
             {speedOptions.map(opt => {
-              const isSelected = playbackSpeed === opt.ms;
+              const isActive = playbackSpeed === opt.ms;
               return (
                 <button
                   key={opt.label}
                   onClick={() => setPlaybackSpeed(opt.ms)}
-                  className={`px-2 py-1 text-[11px] font-medium rounded transition-colors ${
-                    isSelected
-                      ? 'bg-cyan-600 text-white shadow-xs'
-                      : 'text-zinc-400 hover:text-zinc-200'
+                  className={`px-3 py-1 text-[11px] font-semibold rounded-xl transition-all ${
+                    isActive
+                      ? 'bg-white dark:bg-white/15 text-cyan-600 dark:text-cyan-300 shadow-sm border border-black/5 dark:border-white/10'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   {opt.label}

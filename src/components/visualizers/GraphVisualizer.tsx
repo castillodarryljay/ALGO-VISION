@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useAlgoStore } from '../../store/useAlgoStore';
-import { GraphNode, GraphEdge, GraphData } from '../../types/graphs';
+import { GraphNode } from '../../types/graphs';
 import { 
   Play, 
   Pause, 
@@ -8,13 +8,9 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Plus, 
-  Trash2, 
   Network, 
   Compass, 
-  ArrowRight,
-  Layers,
-  AlertOctagon,
-  Sparkles
+  AlertOctagon
 } from 'lucide-react';
 
 export const GraphVisualizer: React.FC = () => {
@@ -37,7 +33,6 @@ export const GraphVisualizer: React.FC = () => {
     pauseGraph,
     resetGraph,
     runGraphAlgorithm,
-    theme
   } = useAlgoStore();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -106,131 +101,132 @@ export const GraphVisualizer: React.FC = () => {
     setGraphData({ ...graphData, nodes: updatedNodes });
   };
 
-  // Node & Edge manipulation
-  const handleAddNode = () => {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const usedLabels = new Set(graphData.nodes.map(n => n.label));
-    let nextLabel = 'A';
-    for (const char of letters) {
-      if (!usedLabels.has(char)) {
-        nextLabel = char;
-        break;
-      }
-    }
-    const newNode: GraphNode = {
-      id: nextLabel,
-      label: nextLabel,
-      x: 100 + Math.floor(Math.random() * 300),
-      y: 80 + Math.floor(Math.random() * 160),
-    };
-    setGraphData({ ...graphData, nodes: [...graphData.nodes, newNode] });
-  };
-
-  const handleDeleteNode = (nodeId: string) => {
-    const filteredNodes = graphData.nodes.filter(n => n.id !== nodeId);
-    const filteredEdges = graphData.edges.filter(e => e.source !== nodeId && e.target !== nodeId);
-    setGraphData({ ...graphData, nodes: filteredNodes, edges: filteredEdges });
-    if (graphStartNode === nodeId && filteredNodes.length > 0) {
-      setGraphStartNode(filteredNodes[0].id);
-    }
-  };
-
+  // Edge creation logic
   const handleNodeClickForEdge = (nodeId: string) => {
     if (!sourceForEdge) {
       setSourceForEdge(nodeId);
     } else {
       if (sourceForEdge !== nodeId) {
-        // Add edge
-        const newEdge: GraphEdge = {
-          id: `e_${sourceForEdge}_${nodeId}_${Date.now()}`,
-          source: sourceForEdge,
-          target: nodeId,
-          weight: newEdgeWeight,
-          isDirected: graphData.isDirected,
-        };
-        setGraphData({ ...graphData, edges: [...graphData.edges, newEdge] });
+        const edgeExists = graphData.edges.some(
+          e => (e.source === sourceForEdge && e.target === nodeId) ||
+               (!graphData.isDirected && e.source === nodeId && e.target === sourceForEdge)
+        );
+
+        if (!edgeExists) {
+          const newEdge = {
+            id: `e_${Date.now()}`,
+            source: sourceForEdge,
+            target: nodeId,
+            weight: newEdgeWeight,
+          };
+          setGraphData({
+            ...graphData,
+            edges: [...graphData.edges, newEdge],
+          });
+        }
       }
       setSourceForEdge(null);
     }
   };
 
-  // Preset graphs
-  const loadPreset = (preset: 'dag' | 'mesh' | 'tree' | 'cycle') => {
-    if (preset === 'dag') {
-      const dagData: GraphData = {
+  const handleAddNode = () => {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const nextLabel = letters[graphData.nodes.length % letters.length] || `N${graphData.nodes.length}`;
+    const nextId = nextLabel;
+    
+    const svgWidth = svgRef.current?.clientWidth || 500;
+    const svgHeight = svgRef.current?.clientHeight || 350;
+    
+    const newNode: GraphNode = {
+      id: nextId,
+      label: nextLabel,
+      x: Math.round(Math.random() * (svgWidth - 120) + 60),
+      y: Math.round(Math.random() * (svgHeight - 120) + 60),
+    };
+
+    setGraphData({
+      ...graphData,
+      nodes: [...graphData.nodes, newNode],
+    });
+  };
+
+  const handleClearGraph = () => {
+    setGraphData({
+      isDirected: graphData.isDirected,
+      isWeighted: graphData.isWeighted,
+      nodes: [],
+      edges: [],
+    });
+  };
+
+  const loadPreset = (type: 'mesh' | 'tree' | 'dag') => {
+    if (type === 'dag') {
+      setGraphData({
         isDirected: true,
         isWeighted: false,
         nodes: [
-          { id: '1', label: 'Task 1', x: 80, y: 120 },
-          { id: '2', label: 'Task 2', x: 220, y: 60 },
-          { id: '3', label: 'Task 3', x: 220, y: 180 },
-          { id: '4', label: 'Task 4', x: 380, y: 60 },
-          { id: '5', label: 'Task 5', x: 380, y: 180 },
-          { id: '6', label: 'Task 6', x: 520, y: 120 },
+          { id: '1', label: '1', x: 80, y: 150 },
+          { id: '2', label: '2', x: 220, y: 80 },
+          { id: '3', label: '3', x: 220, y: 220 },
+          { id: '4', label: '4', x: 380, y: 80 },
+          { id: '5', label: '5', x: 380, y: 220 },
+          { id: '6', label: '6', x: 500, y: 150 },
         ],
         edges: [
-          { id: 'e1', source: '1', target: '2' },
-          { id: 'e2', source: '1', target: '3' },
-          { id: 'e3', source: '2', target: '4' },
-          { id: 'e4', source: '3', target: '5' },
-          { id: 'e5', source: '4', target: '6' },
-          { id: 'e6', source: '5', target: '6' },
+          { id: 'e1', source: '1', target: '2', weight: 1 },
+          { id: 'e2', source: '1', target: '3', weight: 1 },
+          { id: 'e3', source: '2', target: '4', weight: 1 },
+          { id: 'e4', source: '3', target: '5', weight: 1 },
+          { id: 'e5', source: '4', target: '6', weight: 1 },
+          { id: 'e6', source: '5', target: '6', weight: 1 },
         ],
-      };
-      setGraphData(dagData);
+      });
       setSelectedGraphAlgo('topological');
-    } else if (preset === 'mesh') {
-      resetGraph();
     }
   };
 
   return (
     <div className="flex flex-col gap-4 text-xs">
       
-      {/* Algorithm Selector & Options Toolbar */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+      {/* Top Toolbar - Apple iOS Liquid Glass Bar */}
+      <div className="glass-panel rounded-3xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3 border border-white/80 dark:border-white/10 shadow-sm">
+        
+        {/* Algo Selector */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-semibold text-zinc-200 flex items-center gap-1.5">
-            <Network className="w-4 h-4 text-cyan-400" />
-            Graph Algorithm:
-          </span>
+          <div className="flex items-center gap-1.5 font-semibold text-slate-800 dark:text-zinc-200">
+            <Compass className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+            <span>Algorithm:</span>
+          </div>
 
           <select
             value={selectedGraphAlgo}
             onChange={(e) => setSelectedGraphAlgo(e.target.value as any)}
-            className="bg-zinc-950 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-zinc-100 font-medium outline-none focus:border-cyan-500"
+            className="glass-input rounded-2xl px-3.5 py-1.5 font-medium text-xs outline-none"
           >
             <option value="bfs">Breadth-First Search (BFS)</option>
             <option value="dfs">Depth-First Search (DFS)</option>
             <option value="dijkstra">Dijkstra's Shortest Path</option>
-            <option value="astar">A* Search</option>
-            <option value="kruskal">Kruskal's MST (Spanning Tree)</option>
-            <option value="topological">Topological Sort (DAG)</option>
+            <option value="astar">A* Heuristic Search</option>
+            <option value="kruskal">Kruskal's MST</option>
+            <option value="topological">Topological Sort (Kahn's)</option>
           </select>
 
-          {/* Directed / Undirected toggle */}
           <button
-            onClick={() => {
-              setGraphData({ ...graphData, isDirected: !graphData.isDirected });
-            }}
-            className={`px-2.5 py-1.5 rounded-lg border font-medium transition-colors ${
-              graphData.isDirected 
-                ? 'bg-blue-950/80 border-blue-600 text-blue-300' 
-                : 'bg-zinc-800 border-zinc-700 text-zinc-300'
-            }`}
+            onClick={runGraphAlgorithm}
+            className="px-4 py-1.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold shadow-md shadow-cyan-600/30 active:scale-95 transition-all"
           >
-            {graphData.isDirected ? 'Directed →' : 'Undirected —'}
+            Run Algorithm
           </button>
         </div>
 
-        {/* Start / Target node selection */}
-        {(selectedGraphAlgo === 'bfs' || selectedGraphAlgo === 'dfs' || selectedGraphAlgo === 'dijkstra' || selectedGraphAlgo === 'astar') && (
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-400">Start:</span>
+        {/* Start / Target Nodes Selection */}
+        {selectedGraphAlgo !== 'kruskal' && (
+          <div className="flex items-center gap-2 font-mono">
+            <span className="text-slate-500 dark:text-zinc-400 font-sans">Start:</span>
             <select
               value={graphStartNode}
               onChange={(e) => setGraphStartNode(e.target.value)}
-              className="bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-200"
+              className="glass-input rounded-xl px-2.5 py-1 font-semibold text-xs outline-none"
             >
               {graphData.nodes.map(n => (
                 <option key={n.id} value={n.id}>{n.label}</option>
@@ -239,11 +235,11 @@ export const GraphVisualizer: React.FC = () => {
 
             {(selectedGraphAlgo === 'dijkstra' || selectedGraphAlgo === 'astar') && (
               <>
-                <span className="text-zinc-400 ml-1">Target:</span>
+                <span className="text-slate-500 dark:text-zinc-400 ml-1 font-sans">Target:</span>
                 <select
                   value={graphTargetNode}
                   onChange={(e) => setGraphTargetNode(e.target.value)}
-                  className="bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-200"
+                  className="glass-input rounded-xl px-2.5 py-1 font-semibold text-xs outline-none"
                 >
                   {graphData.nodes.map(n => (
                     <option key={n.id} value={n.id}>{n.label}</option>
@@ -258,39 +254,39 @@ export const GraphVisualizer: React.FC = () => {
         <div className="flex items-center gap-1.5 ml-auto">
           <button
             onClick={() => loadPreset('dag')}
-            className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+            className="px-3 py-1.5 rounded-xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white font-medium active:scale-95 transition-all"
           >
             Load DAG
           </button>
           <button
             onClick={resetGraph}
-            className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+            className="px-3 py-1.5 rounded-xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white font-medium active:scale-95 transition-all"
           >
             Sample Mesh
           </button>
           <button
             onClick={handleAddNode}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-medium"
+            className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold shadow-md active:scale-95 transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
-            Add Vertex
+            <span>Add Vertex</span>
           </button>
         </div>
       </div>
 
       {/* SVG Canvas & Editor */}
-      <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-2 relative shadow-inner overflow-hidden min-h-[380px]">
+      <div className="glass-card rounded-3xl p-2 relative shadow-sm overflow-hidden min-h-[400px] border border-white/80 dark:border-white/10">
         {/* Step Info Overlay */}
         {currentStep && (
-          <div className="absolute top-4 left-4 z-10 max-w-sm bg-zinc-900/90 border border-zinc-700/80 rounded-lg p-3 shadow-lg backdrop-blur-xs">
-            <div className="text-[11px] font-semibold text-cyan-400 mb-0.5">
+          <div className="absolute top-4 left-4 z-10 max-w-sm glass-panel rounded-2xl p-4 shadow-lg border border-white/80 dark:border-white/10 backdrop-blur-md">
+            <div className="text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 mb-0.5">
               Step {currentGraphStepIndex + 1} / {graphTraceSteps.length}
             </div>
-            <p className="text-zinc-200 text-xs font-medium">{currentStep.description}</p>
+            <p className="text-slate-800 dark:text-zinc-200 text-xs font-medium leading-relaxed">{currentStep.description}</p>
             {currentStep.hasCycle && (
-              <div className="flex items-center gap-1 mt-1 text-rose-400 font-semibold text-[11px]">
+              <div className="flex items-center gap-1 mt-1.5 text-rose-600 dark:text-rose-400 font-semibold text-[11px]">
                 <AlertOctagon className="w-3.5 h-3.5 shrink-0" />
-                Cycle Detected! DAG invalid.
+                <span>Cycle Detected! DAG invalid.</span>
               </div>
             )}
           </div>
@@ -302,7 +298,7 @@ export const GraphVisualizer: React.FC = () => {
           onMouseUp={handleMouseUpCanvas}
           onTouchMove={handleTouchMoveCanvas}
           onTouchEnd={handleMouseUpCanvas}
-          className="w-full h-[380px] cursor-crosshair select-none touch-none"
+          className="w-full h-[400px] cursor-crosshair select-none touch-none"
         >
           {/* Arrow marker definition for directed edges */}
           <defs>
@@ -315,7 +311,7 @@ export const GraphVisualizer: React.FC = () => {
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
             </marker>
             <marker
               id="arrow-active"
@@ -326,7 +322,7 @@ export const GraphVisualizer: React.FC = () => {
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#06b6d4" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#0284c7" />
             </marker>
           </defs>
 
@@ -338,20 +334,18 @@ export const GraphVisualizer: React.FC = () => {
 
             const isMst = currentStep?.mstEdges?.includes(edge.id);
             const isActive = currentStep?.activeEdgeId === edge.id;
-            const isVisited = currentStep?.visitedEdges?.includes(edge.id);
 
-            let strokeColor = '#3f3f46';
+            let strokeColor = '#cbd5e1';
             let strokeWidth = 2;
+            let marker = graphData.isDirected ? 'url(#arrow)' : undefined;
 
-            if (isMst) {
-              strokeColor = '#10b981';
-              strokeWidth = 4;
-            } else if (isActive) {
-              strokeColor = '#06b6d4';
+            if (isActive) {
+              strokeColor = '#0284c7';
               strokeWidth = 3.5;
-            } else if (isVisited) {
-              strokeColor = '#38bdf8';
-              strokeWidth = 2.5;
+              marker = graphData.isDirected ? 'url(#arrow-active)' : undefined;
+            } else if (isMst) {
+              strokeColor = '#059669';
+              strokeWidth = 3.5;
             }
 
             const midX = (src.x + tgt.x) / 2;
@@ -366,25 +360,25 @@ export const GraphVisualizer: React.FC = () => {
                   y2={tgt.y}
                   stroke={strokeColor}
                   strokeWidth={strokeWidth}
-                  markerEnd={graphData.isDirected ? (isActive ? 'url(#arrow-active)' : 'url(#arrow)') : undefined}
+                  strokeLinecap="round"
+                  markerEnd={marker}
+                  className="transition-colors duration-200"
                 />
-                {edge.weight !== undefined && (
+                {graphData.isWeighted && (
                   <g transform={`translate(${midX}, ${midY})`}>
                     <rect
-                      x="-10"
+                      x="-12"
                       y="-9"
-                      width="20"
+                      width="24"
                       height="18"
-                      rx="4"
-                      fill={theme === 'light' ? '#ffffff' : '#18181b'}
-                      stroke={theme === 'light' ? '#cbd5e1' : '#27272a'}
+                      rx="6"
+                      className="fill-white/90 dark:fill-zinc-900/90 stroke-slate-300 dark:stroke-zinc-700"
+                      strokeWidth="1"
                     />
                     <text
                       textAnchor="middle"
                       dy="4"
-                      fill={theme === 'light' ? '#475569' : '#a1a1aa'}
-                      fontSize="10"
-                      fontWeight="bold"
+                      className="fill-slate-800 dark:fill-zinc-200 font-mono text-[10px] font-bold"
                     >
                       {edge.weight}
                     </text>
@@ -396,24 +390,26 @@ export const GraphVisualizer: React.FC = () => {
 
           {/* Nodes */}
           {graphData.nodes.map(node => {
-            const isActive = currentStep?.activeNodeId === node.id;
             const isVisited = currentStep?.visitedNodes?.includes(node.id);
-            const isConnecting = sourceForEdge === node.id;
+            const isCurrent = currentStep?.activeNodeId === node.id;
+            const isSourceForEdge = sourceForEdge === node.id;
 
-            let fill = theme === 'light' ? '#f1f5f9' : '#18181b';
-            let stroke = theme === 'light' ? '#94a3b8' : '#52525b';
-            let textColor = theme === 'light' ? '#0f172a' : '#e4e4e7';
+            let circleFill = 'fill-white dark:fill-zinc-800';
+            let strokeColor = '#94a3b8';
+            let strokeW = 2.5;
 
-            if (isActive) {
-              fill = '#0284c7';
-              stroke = '#38bdf8';
-              textColor = '#ffffff';
+            if (isCurrent) {
+              circleFill = 'fill-cyan-500';
+              strokeColor = '#0284c7';
+              strokeW = 4;
             } else if (isVisited) {
-              fill = theme === 'light' ? '#d1fae5' : '#064e3b';
-              stroke = '#10b981';
-              textColor = theme === 'light' ? '#065f46' : '#a7f3d0';
-            } else if (isConnecting) {
-              stroke = '#f59e0b';
+              circleFill = 'fill-emerald-500';
+              strokeColor = '#059669';
+              strokeW = 3;
+            } else if (isSourceForEdge) {
+              circleFill = 'fill-amber-400';
+              strokeColor = '#d97706';
+              strokeW = 3.5;
             }
 
             return (
@@ -423,21 +419,18 @@ export const GraphVisualizer: React.FC = () => {
                 onMouseDown={(e) => handleMouseDownNode(e, node)}
                 onTouchStart={(e) => handleTouchStartNode(e, node)}
                 onClick={() => handleNodeClickForEdge(node.id)}
-                className="cursor-grab active:cursor-grabbing"
+                className="cursor-grab active:cursor-grabbing group select-none"
               >
                 <circle
                   r="20"
-                  fill={fill}
-                  stroke={stroke}
-                  strokeWidth="2.5"
-                  className="transition-colors drop-shadow"
+                  className={`${circleFill} transition-all duration-200 shadow-md`}
+                  stroke={strokeColor}
+                  strokeWidth={strokeW}
                 />
                 <text
                   textAnchor="middle"
-                  dy="4"
-                  fill={textColor}
-                  fontSize="12"
-                  fontWeight="bold"
+                  dy="5"
+                  className={`${isCurrent || isVisited ? 'fill-white' : 'fill-slate-900 dark:fill-white'} font-mono text-xs font-bold pointer-events-none`}
                 >
                   {node.label}
                 </text>
@@ -445,10 +438,8 @@ export const GraphVisualizer: React.FC = () => {
                 {currentStep?.distances && currentStep.distances[node.id] !== undefined && (
                   <text
                     textAnchor="middle"
-                    dy="32"
-                    fill="#38bdf8"
-                    fontSize="10"
-                    fontWeight="mono"
+                    dy="34"
+                    className="fill-cyan-600 dark:fill-cyan-400 font-mono text-[10px] font-bold"
                   >
                     d:{currentStep.distances[node.id] === Infinity ? '∞' : currentStep.distances[node.id]}
                   </text>
@@ -456,10 +447,8 @@ export const GraphVisualizer: React.FC = () => {
                 {currentStep?.inDegree && currentStep.inDegree[node.id] !== undefined && (
                   <text
                     textAnchor="middle"
-                    dy="32"
-                    fill="#fbbf24"
-                    fontSize="10"
-                    fontWeight="mono"
+                    dy="34"
+                    className="fill-amber-600 dark:fill-amber-400 font-mono text-[10px] font-bold"
                   >
                     in:{currentStep.inDegree[node.id]}
                   </text>
@@ -470,53 +459,53 @@ export const GraphVisualizer: React.FC = () => {
         </svg>
 
         {/* Tip helper */}
-        <div className="absolute bottom-2 right-3 text-[10px] text-zinc-500 pointer-events-none">
-          Click two nodes in sequence to create an edge. Drag nodes to reposition.
+        <div className="absolute bottom-3 right-4 text-[10px] text-slate-400 dark:text-zinc-500 pointer-events-none font-medium">
+          Click two vertices in sequence to add an edge. Drag vertices to reposition.
         </div>
       </div>
 
       {/* Playback bar for graph execution */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="glass-panel rounded-3xl p-4 flex flex-wrap items-center justify-between gap-3 border border-white/80 dark:border-white/10 shadow-sm">
         <div className="flex items-center gap-2">
           <button
             onClick={() => goToGraphStep(0)}
-            className="p-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+            className="p-2 rounded-xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={stepGraphBackward}
             disabled={currentGraphStepIndex <= 0}
-            className="p-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40"
+            className="p-2 rounded-xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 transition-all active:scale-95"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={stepGraphForward}
             disabled={currentGraphStepIndex >= graphTraceSteps.length - 1}
-            className="p-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40"
+            className="p-2 rounded-xl glass-card text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white disabled:opacity-40 transition-all active:scale-95"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
-          <span className="font-mono text-zinc-400 text-xs ml-1">
+          <span className="font-mono text-slate-600 dark:text-zinc-400 text-xs ml-2 font-medium">
             Step {currentGraphStepIndex + 1} / {graphTraceSteps.length}
           </span>
         </div>
 
         {/* Traversal sequence or queue */}
         {currentStep?.queueOrStack && currentStep.queueOrStack.length > 0 && (
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <span>Frontier Queue:</span>
-            <span className="font-mono text-cyan-300 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-zinc-400">
+            <span className="font-medium">Frontier Queue:</span>
+            <span className="font-mono text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 px-2.5 py-1 rounded-xl border border-cyan-500/20 font-bold">
               [{currentStep.queueOrStack.join(', ')}]
             </span>
           </div>
         )}
 
         {currentStep?.topologicalOrder && currentStep.topologicalOrder.length > 0 && (
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <span>Topological Linear Order:</span>
-            <span className="font-mono text-emerald-300 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-zinc-400">
+            <span className="font-medium">Topological Order:</span>
+            <span className="font-mono text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 font-bold">
               {currentStep.topologicalOrder.join(' → ')}
             </span>
           </div>

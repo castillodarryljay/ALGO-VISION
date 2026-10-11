@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   body {
-    @apply bg-zinc-950 text-zinc-100 antialiased selection:bg-cyan-900 selection:text-white;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Custom scrollbars */
+  /* Apple iOS Sleek Fluid Scrollbars */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -15,200 +18,382 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #3f3f46;
+    background: rgba(148, 163, 184, 0.35);
     border-radius: 9999px;
+    backdrop-filter: blur(8px);
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #52525b;
+    background: rgba(148, 163, 184, 0.6);
   }
 }
 
 /* =========================================================================
-   AlgoVision Light Mode - Clean, Modern, High-Contrast Developer Theme
+   Apple iOS-Inspired Liquid Glass Design Tokens & System
    ========================================================================= */
 
+/* Dark Mode Tokens (Default) */
+:root,
+html.dark,
+.theme-dark {
+  color-scheme: dark;
+  --bg-canvas: #090b10;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --glass-panel-bg: rgba(17, 22, 36, 0.72);
+  --glass-panel-border: rgba(255, 255, 255, 0.09);
+  --glass-panel-shine: rgba(255, 255, 255, 0.12);
+  --glass-panel-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
+
+  --glass-card-bg: rgba(21, 28, 46, 0.65);
+  --glass-card-hover: rgba(27, 36, 60, 0.75);
+  --glass-card-border: rgba(255, 255, 255, 0.08);
+  --glass-card-shine: rgba(255, 255, 255, 0.1);
+  --glass-card-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.45);
+
+  --glass-subtle-bg: rgba(255, 255, 255, 0.04);
+  --glass-subtle-border: rgba(255, 255, 255, 0.07);
+
+  --glass-input-bg: rgba(11, 15, 26, 0.75);
+  --glass-input-border: rgba(255, 255, 255, 0.1);
+
+  --glass-code-bg: rgba(10, 13, 22, 0.88);
+  --glass-code-border: rgba(255, 255, 255, 0.08);
+
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #34d399;
+  --accent-amber: #fbbf24;
+  --accent-rose: #fb7185;
+  --accent-indigo: #818cf8;
+}
+
+/* Light Mode Tokens (Apple Liquid Glass) */
 html.light,
 .theme-light {
   color-scheme: light;
+  --bg-canvas: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+
+  --glass-panel-bg: rgba(255, 255, 255, 0.82);
+  --glass-panel-border: rgba(226, 232, 240, 0.85);
+  --glass-panel-shine: rgba(255, 255, 255, 0.95);
+  --glass-panel-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+
+  --glass-card-bg: rgba(255, 255, 255, 0.78);
+  --glass-card-hover: rgba(255, 255, 255, 0.95);
+  --glass-card-border: rgba(226, 232, 240, 0.82);
+  --glass-card-shine: rgba(255, 255, 255, 0.95);
+  --glass-card-shadow: 0 10px 28px -6px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.03);
+
+  --glass-subtle-bg: rgba(241, 245, 249, 0.75);
+  --glass-subtle-border: rgba(226, 232, 240, 0.85);
+
+  --glass-input-bg: rgba(255, 255, 255, 0.92);
+  --glass-input-border: rgba(203, 213, 225, 0.85);
+
+  --glass-code-bg: rgba(248, 250, 252, 0.96);
+  --glass-code-border: rgba(226, 232, 240, 0.9);
+
+  --accent-cyan: #0284c7;
+  --accent-emerald: #059669;
+  --accent-amber: #d97706;
+  --accent-rose: #e11d48;
+  --accent-indigo: #4f46e5;
+}
+
+/* Base Body Styling */
+html.dark body,
+.theme-dark body {
+  background-color: var(--bg-canvas) !important;
+  color: var(--text-primary) !important;
 }
 
 html.light body,
 .theme-light body {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: var(--bg-canvas) !important;
+  color: var(--text-primary) !important;
 }
 
-.theme-light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-}
-.theme-light ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* =========================================================================
+   Apple Liquid Glass Components
+   ========================================================================= */
+
+.glass-panel {
+  background: var(--glass-panel-bg);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--glass-panel-border);
+  box-shadow: var(--glass-panel-shadow), inset 0 1px 1px var(--glass-panel-shine);
 }
 
-/* Page, Containers & Cards */
+.glass-card {
+  background: var(--glass-card-bg);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: var(--glass-card-shadow), inset 0 1px 0 var(--glass-card-shine);
+}
+
+.glass-card-interactive {
+  background: var(--glass-card-bg);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: var(--glass-card-shadow), inset 0 1px 0 var(--glass-card-shine);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.22s ease, 
+              background-color 0.22s ease,
+              border-color 0.22s ease;
+}
+.glass-card-interactive:hover {
+  background: var(--glass-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px -8px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.theme-dark .glass-card-interactive:hover {
+  box-shadow: 0 20px 44px -8px rgba(0, 0, 0, 0.6);
+}
+.glass-card-interactive:active {
+  transform: scale(0.985);
+}
+
+.glass-subtle {
+  background: var(--glass-subtle-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-subtle-border);
+}
+
+.glass-input {
+  background: var(--glass-input-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-input-border);
+  color: var(--text-primary);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.glass-input:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.22);
+}
+
+/* Tactile iOS Press Physics */
+.ios-press {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, opacity 0.18s ease;
+}
+.ios-press:active {
+  transform: scale(0.965);
+}
+
+/* =========================================================================
+   Light Theme Cohesive Overrides & High-Contrast Typography
+   ========================================================================= */
+
+/* Legacy fallback container normalization in Light Mode */
 .theme-light .bg-zinc-950 {
-  background-color: #f8fafc !important;
+  background-color: rgba(248, 250, 252, 0.85) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
-.theme-light .bg-zinc-950\/90,
-.theme-light .bg-zinc-950\/80,
-.theme-light .bg-zinc-950\/70,
-.theme-light .bg-zinc-950\/60,
-.theme-light .bg-zinc-950\/40 {
-  background-color: #f1f5f9 !important;
+
+.theme-light .bg-zinc-900 {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-color: rgba(226, 232, 240, 0.85) !important;
+  box-shadow: 0 10px 30px -6px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
 }
-.theme-light .bg-zinc-900,
+
 .theme-light .bg-zinc-900\/90,
-.theme-light .bg-zinc-900\/80 {
-  background-color: #ffffff !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-}
-.theme-light .bg-zinc-850,
-.theme-light .bg-zinc-800,
-.theme-light .bg-zinc-800\/90,
-.theme-light .bg-zinc-800\/80,
-.theme-light .bg-zinc-800\/60,
-.theme-light .bg-zinc-800\/40 {
-  background-color: #f1f5f9 !important;
-}
-.theme-light .hover\:bg-zinc-900:hover,
-.theme-light .hover\:bg-zinc-850:hover,
-.theme-light .hover\:bg-zinc-800:hover {
-  background-color: #e2e8f0 !important;
-}
-.theme-light .hover\:bg-zinc-700:hover {
-  background-color: #cbd5e1 !important;
+.theme-light .bg-zinc-900\/80,
+.theme-light .bg-zinc-900\/70,
+.theme-light .bg-zinc-900\/60,
+.theme-light .bg-zinc-900\/50 {
+  background-color: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: rgba(226, 232, 240, 0.8) !important;
 }
 
-/* Borders */
-.theme-light .border-zinc-900,
-.theme-light .border-zinc-800,
-.theme-light .border-zinc-800\/80,
-.theme-light .border-zinc-800\/60 {
-  border-color: #e2e8f0 !important;
-}
-.theme-light .border-zinc-700,
-.theme-light .border-zinc-700\/80,
-.theme-light .border-zinc-700\/60,
-.theme-light .border-zinc-700\/50 {
-  border-color: #cbd5e1 !important;
-}
-.theme-light .divide-zinc-800 > * + * {
-  border-color: #e2e8f0 !important;
+.theme-light .bg-zinc-950\/80,
+.theme-light .bg-zinc-950\/60,
+.theme-light .bg-zinc-950\/50 {
+  background-color: rgba(241, 245, 249, 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-/* Primary Headings & Text */
-.theme-light h1,
-.theme-light h2,
-.theme-light h3,
-.theme-light h4,
-.theme-light h5,
-.theme-light h6 {
-  color: #0f172a !important;
-}
-
-.theme-light .text-white {
-  color: #0f172a !important;
-}
-.theme-light .text-zinc-100 {
-  color: #0f172a !important;
-}
-.theme-light .text-zinc-200 {
+.theme-light .bg-zinc-800 {
+  background-color: rgba(241, 245, 249, 0.85) !important;
+  border-color: rgba(226, 232, 240, 0.85) !important;
   color: #1e293b !important;
 }
-.theme-light .text-zinc-300 {
-  color: #334155 !important;
+
+.theme-light .bg-zinc-800\/80,
+.theme-light .bg-zinc-800\/60 {
+  background-color: rgba(241, 245, 249, 0.75) !important;
+  border-color: rgba(226, 232, 240, 0.8) !important;
 }
-.theme-light .text-zinc-400 {
-  color: #64748b !important;
-}
-.theme-light .text-zinc-500 {
-  color: #64748b !important;
-}
-.theme-light .text-zinc-600 {
-  color: #94a3b8 !important;
-}
-.theme-light .hover\:text-white:hover,
-.theme-light .hover\:text-zinc-100:hover,
-.theme-light .hover\:text-zinc-200:hover {
+
+.theme-light .hover\:bg-zinc-800:hover,
+.theme-light .hover\:bg-zinc-700:hover {
+  background-color: rgba(226, 232, 240, 0.85) !important;
   color: #0f172a !important;
 }
 
-/* Retain crisp white text inside intentional filled buttons & active states */
-.theme-light button.bg-cyan-600,
-.theme-light button.bg-cyan-500,
-.theme-light button.bg-rose-500,
-.theme-light button.bg-emerald-600,
-.theme-light button.bg-emerald-500,
-.theme-light .bg-cyan-600,
-.theme-light .bg-cyan-600 *,
-.theme-light .bg-cyan-500,
-.theme-light .bg-cyan-500 *,
-.theme-light .bg-rose-500,
-.theme-light .bg-rose-500 *,
-.theme-light .bg-emerald-600,
-.theme-light .bg-emerald-600 *,
-.theme-light .bg-emerald-500,
-.theme-light .bg-emerald-500 * {
+/* Light Theme Borders */
+.theme-light .border-zinc-800,
+.theme-light .border-zinc-800\/80,
+.theme-light .border-zinc-800\/60,
+.theme-light .border-zinc-700,
+.theme-light .border-zinc-700\/80,
+.theme-light .border-zinc-700\/60 {
+  border-color: rgba(226, 232, 240, 0.85) !important;
+}
+
+/* =========================================================================
+   CRISP WHITE TEXT PRESERVATION ON COLORED / GRADIENT SURFACES
+   (Fixes unreadable dark text on colored buttons, tabs, sorting bars & badges)
+   ========================================================================= */
+
+.theme-light .bg-gradient-to-r,
+.theme-light .bg-gradient-to-t,
+.theme-light .bg-gradient-to-tr,
+.theme-light [class*="from-cyan-"],
+.theme-light [class*="from-blue-"],
+.theme-light [class*="from-emerald-"],
+.theme-light [class*="from-rose-"],
+.theme-light [class*="from-indigo-"],
+.theme-light [class*="bg-cyan-600"],
+.theme-light [class*="bg-cyan-500"],
+.theme-light [class*="bg-emerald-600"],
+.theme-light [class*="bg-emerald-500"],
+.theme-light [class*="bg-rose-600"],
+.theme-light [class*="bg-rose-500"],
+.theme-light [class*="bg-amber-600"],
+.theme-light [class*="bg-indigo-600"],
+.theme-light [class*="bg-slate-900"],
+.theme-light [class*="bg-slate-800"],
+.theme-light .text-white {
   color: #ffffff !important;
 }
 
-/* Hero Section Gradient Text in Light Mode */
-.theme-light .bg-gradient-to-r.from-cyan-400.via-blue-400.to-indigo-400 {
-  background-image: linear-gradient(to right, #0284c7, #2563eb, #4f46e5) !important;
+.theme-light .bg-gradient-to-r *,
+.theme-light .bg-gradient-to-t *,
+.theme-light .bg-gradient-to-tr *,
+.theme-light [class*="from-cyan-"] *,
+.theme-light [class*="from-blue-"] *,
+.theme-light [class*="from-emerald-"] *,
+.theme-light [class*="from-rose-"] *,
+.theme-light [class*="from-indigo-"] *,
+.theme-light [class*="bg-cyan-600"] *,
+.theme-light [class*="bg-cyan-500"] *,
+.theme-light [class*="bg-emerald-600"] *,
+.theme-light [class*="bg-emerald-500"] *,
+.theme-light [class*="bg-rose-600"] *,
+.theme-light [class*="bg-rose-500"] *,
+.theme-light [class*="bg-amber-600"] *,
+.theme-light [class*="bg-indigo-600"] *,
+.theme-light [class*="bg-slate-900"] *,
+.theme-light [class*="bg-slate-800"] *,
+.theme-light .text-white * {
+  color: #ffffff !important;
 }
 
-/* Light Mode Badges & Category Tags */
+/* SVG icons inside filled buttons and colored badges remain white */
+.theme-light .bg-gradient-to-r svg,
+.theme-light .bg-gradient-to-t svg,
+.theme-light .bg-gradient-to-tr svg,
+.theme-light [class*="from-cyan-"] svg,
+.theme-light [class*="from-blue-"] svg,
+.theme-light [class*="from-emerald-"] svg,
+.theme-light [class*="from-rose-"] svg,
+.theme-light [class*="from-indigo-"] svg,
+.theme-light [class*="bg-cyan-600"] svg,
+.theme-light [class*="bg-emerald-600"] svg,
+.theme-light [class*="bg-rose-500"] svg,
+.theme-light [class*="bg-rose-600"] svg,
+.theme-light [class*="bg-amber-600"] svg {
+  color: #ffffff !important;
+  stroke: currentColor;
+}
+
+.theme-light svg text.fill-white,
+.theme-light svg .fill-white {
+  fill: #ffffff !important;
+}
+
+/* Text Hierarchy for un-prefixed neutral text in light mode */
+.theme-light :not([class*="bg-gradient-"]):not([class*="from-"]):not([class*="bg-cyan-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-6"]).text-zinc-100 {
+  color: #0f172a;
+}
+.theme-light :not([class*="bg-gradient-"]):not([class*="from-"]):not([class*="bg-cyan-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-6"]).text-zinc-200 {
+  color: #1e293b;
+}
+.theme-light :not([class*="bg-gradient-"]):not([class*="from-"]):not([class*="bg-cyan-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-6"]).text-zinc-300 {
+  color: #334155;
+}
+.theme-light :not([class*="bg-gradient-"]):not([class*="from-"]):not([class*="bg-cyan-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-6"]).text-zinc-400 {
+  color: #475569;
+}
+.theme-light :not([class*="bg-gradient-"]):not([class*="from-"]):not([class*="bg-cyan-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-amber-6"]).text-zinc-500 {
+  color: #64748b;
+}
+
+/* Light Theme Inputs */
+.theme-light input[type="text"],
+.theme-light input[type="number"],
+.theme-light select,
+.theme-light textarea {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(203, 213, 225, 0.85) !important;
+  color: #0f172a !important;
+}
+.theme-light input::placeholder,
+.theme-light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Light Mode Soft Accents & Pills */
 .theme-light .bg-cyan-950,
-.theme-light .bg-cyan-950\/90,
 .theme-light .bg-cyan-950\/80,
-.theme-light .bg-cyan-950\/70 {
-  background-color: #e0f2fe !important;
-  border-color: #bae6fd !important;
+.theme-light .bg-cyan-950\/90 {
+  background-color: rgba(224, 242, 254, 0.85) !important;
+  border-color: rgba(186, 230, 253, 0.9) !important;
   color: #0284c7 !important;
 }
-.theme-light .bg-amber-950,
-.theme-light .bg-amber-950\/90,
-.theme-light .bg-amber-950\/80,
-.theme-light .bg-amber-950\/60 {
-  background-color: #fef3c7 !important;
-  border-color: #fde68a !important;
-  color: #b45309 !important;
-}
 .theme-light .bg-emerald-950,
-.theme-light .bg-emerald-950\/90,
-.theme-light .bg-emerald-950\/80,
-.theme-light .bg-emerald-950\/60 {
-  background-color: #d1fae5 !important;
-  border-color: #a7f3d0 !important;
+.theme-light .bg-emerald-950\/80 {
+  background-color: rgba(209, 250, 229, 0.85) !important;
+  border-color: rgba(167, 243, 208, 0.9) !important;
   color: #047857 !important;
 }
+.theme-light .bg-amber-950,
+.theme-light .bg-amber-950\/80 {
+  background-color: rgba(254, 243, 199, 0.85) !important;
+  border-color: rgba(253, 230, 138, 0.9) !important;
+  color: #b45309 !important;
+}
 .theme-light .bg-rose-950,
-.theme-light .bg-rose-950\/90,
-.theme-light .bg-rose-950\/80,
-.theme-light .bg-rose-950\/60 {
-  background-color: #ffe4e6 !important;
-  border-color: #fecdd3 !important;
+.theme-light .bg-rose-950\/80 {
+  background-color: rgba(255, 228, 230, 0.85) !important;
+  border-color: rgba(254, 205, 211, 0.9) !important;
   color: #be123c !important;
 }
 .theme-light .bg-purple-950,
-.theme-light .bg-purple-950\/90,
 .theme-light .bg-purple-950\/80 {
-  background-color: #f3e8ff !important;
-  border-color: #e9d5ff !important;
+  background-color: rgba(243, 232, 255, 0.85) !important;
+  border-color: rgba(233, 213, 255, 0.9) !important;
   color: #7e22ce !important;
 }
-.theme-light .bg-blue-950,
-.theme-light .bg-blue-950\/90,
-.theme-light .bg-blue-950\/80 {
-  background-color: #dbeafe !important;
-  border-color: #bfdbfe !important;
-  color: #1d4ed8 !important;
-}
 
-/* Light Mode Accent Texts */
+/* Accent Text Colors in Light Mode */
 .theme-light .text-cyan-400,
-.theme-light .text-cyan-300,
-.theme-light .text-cyan-200 {
+.theme-light .text-cyan-300 {
   color: #0284c7 !important;
 }
 .theme-light .text-emerald-400,
@@ -223,43 +408,28 @@ html.light body,
 .theme-light .text-rose-300 {
   color: #e11d48 !important;
 }
-.theme-light .text-purple-400,
-.theme-light .text-purple-300 {
-  color: #9333ea !important;
+.theme-light .text-purple-400 {
+  color: #7e22ce !important;
 }
 
-/* Inputs, Textareas & Selects */
-.theme-light input[type="text"],
-.theme-light input[type="number"],
-.theme-light textarea,
-.theme-light select {
-  background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-.theme-light input[type="text"]::placeholder,
-.theme-light textarea::placeholder {
-  color: #94a3b8 !important;
-}
-.theme-light input[type="range"] {
-  background-color: #e2e8f0 !important;
-}
-
-/* Sorting & Comparing Visualizer Bars */
+/* Visualization Default Bars in Light Mode */
 .theme-light .h-56 .bg-zinc-800,
 .theme-light .h-32 .bg-zinc-800 {
-  background-color: #94a3b8 !important;
-  border-color: #64748b !important;
+  background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%) !important;
+  border-color: #cbd5e1 !important;
   color: #ffffff !important;
 }
 .theme-light .h-56 .hover\:bg-zinc-750:hover,
 .theme-light .h-32 .hover\:bg-zinc-750:hover {
-  background-color: #64748b !important;
+  background: linear-gradient(180deg, #64748b 0%, #475569 100%) !important;
 }
 
 /* Code Panel in Light Mode */
+.theme-light .select-text {
+  color: #1e293b !important;
+}
 .theme-light .select-text.bg-zinc-950 {
-  background-color: #f8fafc !important;
+  background-color: rgba(248, 250, 252, 0.95) !important;
   color: #1e293b !important;
 }
 .theme-light .select-text .text-zinc-600 {
@@ -269,7 +439,7 @@ html.light body,
   color: #334155 !important;
 }
 .theme-light .select-text .bg-cyan-950\/90 {
-  background-color: #e0f2fe !important;
+  background-color: rgba(224, 242, 254, 0.95) !important;
   color: #0369a1 !important;
   border-left-color: #0284c7 !important;
 }
@@ -280,56 +450,12 @@ html.light body,
   color: #0284c7 !important;
 }
 
-/* Execution Console in Light Mode */
-.theme-light table thead {
-  background-color: #f1f5f9 !important;
-  color: #475569 !important;
+/* Fixed Modals & Backdrops */
+.fixed.inset-0.bg-black\/70 {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
-.theme-light table tbody tr:hover {
-  background-color: #f8fafc !important;
+.theme-light .fixed.inset-0.bg-black\/70,
+.theme-light .fixed.inset-0.bg-black\/40 {
+  background-color: rgba(15, 23, 42, 0.28) !important;
 }
-
-/* Featured Gradients in Light Mode */
-.theme-light .from-cyan-900\/50.to-blue-900\/30 {
-  background-image: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%) !important;
-  border-color: #bae6fd !important;
-}
-.theme-light .from-amber-900\/50.to-orange-900\/30 {
-  background-image: linear-gradient(135deg, #fffbeb 0%, #ffedd5 100%) !important;
-  border-color: #fed7aa !important;
-}
-.theme-light .from-emerald-900\/50.to-teal-900\/30 {
-  background-image: linear-gradient(135deg, #f0fdf4 0%, #ccfbf1 100%) !important;
-  border-color: #a7f3d0 !important;
-}
-.theme-light .from-purple-900\/50.to-indigo-900\/30 {
-  background-image: linear-gradient(135deg, #faf5ff 0%, #e0e7ff 100%) !important;
-  border-color: #ddd6fe !important;
-}
-
-/* Graph Canvas & Nodes in Light Mode */
-.theme-light svg.cursor-crosshair {
-  background-color: #ffffff !important;
-}
-.theme-light svg line {
-  stroke: #cbd5e1 !important;
-}
-.theme-light svg circle {
-  stroke: #94a3b8;
-}
-
-/* Settings Modal Backdrop */
-.theme-light .fixed.inset-0.bg-black\/70 {
-  background-color: rgba(15, 23, 42, 0.45) !important;
-}
-
-/* Header & Footer */
-.theme-light header {
-  background-color: rgba(255, 255, 255, 0.92) !important;
-  border-color: #e2e8f0 !important;
-}
-.theme-light footer {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-}
-
